@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hitchhiker's Guide for Upgrading to Oracle AI Database — LiveLabs</title>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --oracle-red:    #C74634;
+  --rule-gold:     #C8882A;
+  --nav-bg:        #1A1A1A;
+  --banner-bg:     #F5F0DC;
+  --banner-border: #D4B44A;
+  --sidebar-bg:    #F8F8F8;
+  --sidebar-border:#E0E0E0;
+  --sidebar-active:#E8F0FE;
+  --sidebar-active-text: #1A3A6B;
+  --journey-strip: #192634;
+  --journey-gold:  #E8A830;
+  --text-dark:     #1A1A1A;
+  --text-mid:      #444;
+  --text-light:    #777;
+  --border:        #DEDEDE;
+  --done-green:    #2E7D32;
+  --done-bg:       #E8F5E9;
+  --inprogress:    #1565C0;
+  --link-blue:     #C74634;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Open Sans', Arial, sans-serif; font-size: 13px; color: var(--text-dark); background: #fff; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+
+/* ── TOP NAV ── */
+.top-nav {
+  background: var(--nav-bg);
+  height: 44px; display: flex; align-items: center;
+  padding: 0 16px; gap: 12px; flex-shrink: 0; z-index: 50;
+}
+.nav-logo {
+  display: flex; align-items: center; gap: 6px;
+  color: #fff; text-decoration: none; font-weight: 700;
+  font-size: 14px; white-space: nowrap;
+}
+.nav-logo-box {
+  background: var(--oracle-red); color: #fff;
+  padding: 2px 7px; border-radius: 2px;
+  font-size: 12px; font-weight: 700;
+}
+.nav-search {
+  flex: 1; max-width: 700px;
+  background: #fff; border: none; border-radius: 3px;
+  padding: 6px 12px; font-size: 12.5px; font-family: inherit;
+  outline: none; color: #333;
+}
+.nav-search::placeholder { color: #aaa; }
+.nav-right { margin-left: auto; display: flex; align-items: center; gap: 16px; }
+.nav-right a {
+  color: rgba(255,255,255,0.82); text-decoration: none;
+  font-size: 12px; display: flex; align-items: center; gap: 5px;
+  transition: color .2s;
+}
+.nav-right a:hover { color: #fff; }
+.nav-right .signin { font-weight: 600; }
+
+/* ── JOURNEY CONTEXT STRIP ── */
+.journey-strip {
+  background: var(--journey-strip);
+  border-bottom: 2px solid var(--journey-gold);
+  padding: 0 16px;
+  display: flex; align-items: center;
+  height: 44px; gap: 0; flex-shrink: 0;
+}
+.js-back {
+  display: flex; align-items: center; gap: 6px;
+  color: rgba(255,255,255,0.7); text-decoration: none;
+  font-size: 12px; font-weight: 600;
+  padding: 0 12px 0 0;
+  border-right: 1px solid rgba(255,255,255,0.15);
+  margin-right: 12px;
+  transition: color .2s;
+  white-space: nowrap;
+}
+.js-back:hover { color: #fff; }
+.js-back svg { flex-shrink: 0; }
+.js-label {
+  font-size: 10px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.8px; color: var(--journey-gold);
+  margin-right: 8px; white-space: nowrap;
+}
+.js-name {
+  font-size: 12.5px; font-weight: 600; color: rgba(255,255,255,0.9);
+  margin-right: 16px; white-space: nowrap;
+}
+.js-divider { color: rgba(255,255,255,0.25); margin: 0 4px; }
+
+/* Journey progress bar (replaces pills) */
+.js-progress {
+  display: flex; align-items: center; gap: 10px;
+  flex: 1; margin: 0 16px;
+}
+.js-track {
+  flex: 1; height: 6px; max-width: 220px;
+  background: rgba(255,255,255,0.15);
+  border-radius: 4px; overflow: hidden;
+}
+.js-fill {
+  height: 100%; width: 16.6%;
+  background: linear-gradient(90deg, var(--oracle-red), #E07060);
+  border-radius: 4px; transition: width .4s ease;
+}
+.js-counter {
+  white-space: nowrap; font-size: 11px;
+  color: rgba(255,255,255,0.55);
+}
+.js-counter strong { color: rgba(255,255,255,0.85); font-weight: 600; }
+
+/* ── BREADCRUMB ── */
+.breadcrumb-bar {
+  background: var(--nav-bg);
+  padding: 0 16px; height: 32px;
+  display: flex; align-items: center; gap: 5px;
+  font-size: 11.5px; flex-shrink: 0;
+}
+.breadcrumb-bar a {
+  color: rgba(255,255,255,0.65); text-decoration: none;
+  transition: color .2s;
+}
+.breadcrumb-bar a:hover { color: #fff; text-decoration: underline; }
+.breadcrumb-bar span { color: rgba(255,255,255,0.35); }
+.breadcrumb-bar .bc-current { color: rgba(255,255,255,0.85); }
+.bc-icons { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+.bc-icons a {
+  color: rgba(255,255,255,0.55); text-decoration: none;
+  font-size: 11.5px; display: flex; align-items: center; gap: 4px;
+}
+.bc-icons a:hover { color: #fff; }
+
+/* ── MAIN LAYOUT ── */
+.page-body {
+  display: flex; flex: 1; overflow: hidden;
+}
+
+/* ── SIDEBAR ── */
+.sidebar {
+  width: 220px; flex-shrink: 0;
+  background: var(--sidebar-bg);
+  border-right: 1px solid var(--sidebar-border);
+  overflow-y: auto; font-size: 12px;
+}
+.sidebar::-webkit-scrollbar { width: 4px; }
+.sidebar::-webkit-scrollbar-thumb { background: #ccc; border-radius: 2px; }
+
+.sb-section { border-bottom: 1px solid var(--sidebar-border); }
+.sb-section-head {
+  padding: 10px 12px;
+  font-size: 11px; font-weight: 700; color: var(--text-mid);
+  text-transform: uppercase; letter-spacing: 0.5px;
+  cursor: pointer; display: flex; align-items: center;
+  justify-content: space-between; user-select: none;
+}
+.sb-section-head:hover { background: #f0f0f0; }
+.sb-caret { font-size: 9px; color: #aaa; transition: transform .2s; }
+.sb-section.open .sb-caret { transform: rotate(180deg); }
+
+.sb-link {
+  display: flex; align-items: center; gap: 7px;
+  padding: 7px 12px 7px 20px;
+  color: var(--text-mid); text-decoration: none;
+  font-size: 12px; line-height: 1.4;
+  transition: background .15s;
+  border-left: 3px solid transparent;
+}
+.sb-link:hover { background: #efefef; }
+.sb-link.active {
+  background: var(--sidebar-active);
+  color: var(--sidebar-active-text);
+  border-left-color: var(--oracle-red);
+  font-weight: 600;
+}
+.sb-link.done { color: var(--done-green); }
+.sb-link.done .sb-dot { background: var(--done-green); }
+.sb-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: #ccc; flex-shrink: 0;
+}
+.sb-dot.active-dot { background: var(--oracle-red); }
+.sb-check { font-size: 11px; color: var(--done-green); flex-shrink: 0; }
+
+/* ── CONTENT ── */
+.content {
+  flex: 1; overflow-y: auto; padding: 0;
+  background: #fff;
+}
+.content::-webkit-scrollbar { width: 6px; }
+.content::-webkit-scrollbar-thumb { background: #ddd; border-radius: 3px; }
+
+/* Mark complete button — lives in the journey strip header */
+.mark-done-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--oracle-red); color: #fff;
+  padding: 5px 13px; border-radius: 3px;
+  font-size: 11.5px; font-weight: 600;
+  border: none; cursor: pointer; font-family: inherit;
+  transition: background .2s; white-space: nowrap; flex-shrink: 0;
+}
+.mark-done-btn:hover { background: #A5392A; }
+.mark-done-btn.completed { background: var(--done-green); }
+.mark-done-btn.completed:hover { background: #1B5E20; }
+
+/* Content body */
+.content-inner { padding: 24px 28px 48px; max-width: 960px; }
+
+.content h1 {
+  font-size: 22px; font-weight: 700; color: var(--text-dark);
+  margin-bottom: 18px; padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+.content h2 {
+  font-size: 15px; font-weight: 700; color: var(--text-dark);
+  margin: 22px 0 8px;
+}
+.content h3 {
+  font-size: 13.5px; font-weight: 700; color: var(--text-dark);
+  margin: 16px 0 6px;
+}
+.content p { font-size: 13px; line-height: 1.75; color: #333; margin-bottom: 10px; }
+.content a { color: var(--link-blue); text-decoration: underline; }
+.content ul { margin: 8px 0 12px 20px; }
+.content ul li { font-size: 13px; line-height: 1.7; color: #333; margin-bottom: 3px; }
+
+.collapse-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: #f0f0f0; border: 1px solid #ccc;
+  padding: 5px 12px; border-radius: 3px;
+  font-size: 12px; font-weight: 600; color: #444;
+  cursor: pointer; margin: 14px 0 20px;
+  font-family: inherit;
+}
+.collapse-btn:hover { background: #e5e5e5; }
+
+/* Section toggle headers */
+.section-toggle {
+  display: flex; align-items: center; gap: 8px;
+  color: var(--text-dark); cursor: pointer;
+  font-size: 15px; font-weight: 700;
+  margin: 20px 0 10px; user-select: none;
+}
+.section-toggle .toggle-icon { color: var(--text-light); font-size: 11px; }
+
+/* Table */
+.content table {
+  border-collapse: collapse; width: auto;
+  margin: 12px 0; font-size: 12.5px;
+}
+.content th {
+  background: #5A8A7A; color: #fff;
+  padding: 6px 12px; text-align: left; font-weight: 600;
+}
+.content td {
+  border: 1px solid #ccc;
+  padding: 6px 12px; vertical-align: middle;
+}
+.content tr:nth-child(even) td { background: #f9f9f9; }
+.env-tag {
+  display: inline-block; padding: 2px 7px; border-radius: 3px;
+  font-size: 11px; font-weight: 600; background: #e8f5e9; color: #2E7D32;
+}
+
+/* Labs grid */
+.labs-table {
+  border: 1px solid #ccc; border-radius: 4px; overflow: hidden;
+  margin: 14px 0; width: auto; min-width: 380px;
+}
+.labs-table-head {
+  background: #5A8A7A; color: #fff;
+  text-align: center; padding: 8px; font-weight: 700; font-size: 14px;
+}
+.labs-grid { display: flex; }
+.labs-col0 {
+  border-right: 1px solid #ccc;
+  display: flex; flex-direction: column;
+}
+.labs-col0-cell {
+  padding: 10px 14px; border-bottom: 1px solid #ccc;
+  font-size: 13px; font-weight: 700; color: #555;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  min-height: 52px;
+}
+.labs-col0-cell:last-child { border-bottom: none; }
+.labs-tracks { flex: 1; }
+.labs-track-row {
+  display: flex; align-items: center;
+  border-bottom: 1px solid #ccc; min-height: 52px;
+}
+.labs-track-row:last-child { border-bottom: none; }
+.track-label {
+  width: 70px; flex-shrink: 0;
+  padding: 0 10px; font-size: 12px; font-weight: 700; color: #555;
+  border-right: 1px solid #ccc; height: 100%;
+  display: flex; align-items: center;
+}
+.track-labs { display: flex; flex-wrap: wrap; gap: 4px; padding: 8px 10px; }
+.lab-num {
+  width: 28px; height: 28px; border-radius: 3px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 700; cursor: pointer;
+  background: #eee; color: #444;
+  transition: background .15s;
+}
+.lab-num:hover { background: #ddd; }
+.lab-num.current { background: var(--oracle-red); color: #fff; }
+
+/* Note / callout */
+.callout {
+  background: #FFF8E1; border-left: 3px solid #F9A825;
+  padding: 10px 14px; border-radius: 0 4px 4px 0;
+  font-size: 12.5px; line-height: 1.6; margin: 12px 0; color: #5A3E00;
+}
+
+
+</style>
+</head>
+<body>
+
+<!-- ── TOP NAV ── -->
+<header class="top-nav">
+  <a href="#" class="nav-logo">
+    <span class="nav-logo-box">LiveLabs</span>
+  </a>
+  <input class="nav-search" type="text" placeholder="Search for workshops and sprints…">
+  <div class="nav-right">
+    <a href="#">⌨ Event Code</a>
+    <a href="#" class="signin">↪ Sign In</a>
+  </div>
+</header>
+
+<!-- ── JOURNEY CONTEXT STRIP ── -->
+<div class="journey-strip">
+  <a href="#" class="js-back">
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9 11L5 7L9 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    Back to Journey
+  </a>
+  <span class="js-label">Journey</span>
+  <span class="js-name">Oracle Database Fundamentals</span>
+  <span class="js-divider">·</span>
+
+  <div class="js-progress">
+    <div class="js-track"><div class="js-fill" id="js-fill"></div></div>
+    <span class="js-counter" id="js-counter"><strong>1 of 6</strong> complete</span>
+  </div>
+  <button class="mark-done-btn" id="markDoneBtn" onclick="markDone()">✓ Mark Complete</button>
+</div>
+
+<!-- ── BREADCRUMB ── -->
+<div class="breadcrumb-bar">
+  <a href="#">Hitchhiker's Guide for Upgrading to Oracle AI Database</a>
+  <span>›</span>
+  <span class="bc-current">Introduction</span>
+  <div class="bc-icons">
+    <a href="#">? Help</a>
+    <a href="#">? Tutorial</a>
+    <a href="#">⚙</a>
+  </div>
+</div>
+
+<!-- ── PAGE BODY ── -->
+<div class="page-body">
+
+  <!-- ── SIDEBAR ── -->
+  <aside class="sidebar">
+
+    <div class="sb-section open">
+      <div class="sb-section-head">Introduction <span class="sb-caret">▾</span></div>
+      <a href="#" class="sb-link active"><span class="sb-dot active-dot"></span>About the Workshop</a>
+      <a href="#" class="sb-link"><span class="sb-dot"></span>About the workshop contents</a>
+      <a href="#" class="sb-link"><span class="sb-dot"></span>Upgrade and data migration methods and processes</a>
+      <a href="#" class="sb-link"><span class="sb-dot"></span>Learn More</a>
+      <a href="#" class="sb-link"><span class="sb-dot"></span>Acknowledgements</a>
+    </div>
+
+    <div class="sb-section">
+      <div class="sb-section-head" style="color:#2E7D32;">✓ Get Started <span class="sb-caret">▾</span></div>
+    </div>
+
+    <div class="sb-section">
+      <div class="sb-section-head">Lab 1: Initialize Environment <span class="sb-caret">▾</span></div>
+    </div>
+
+    <div class="sb-section">
+      <div class="sb-section-head">Lab 2: Explore Multitenant Architecture <span class="sb-caret">▾</span></div>
+    </div>
+
+    <div class="sb-section">
+      <div class="sb-section-head">Lab 3: Generate AutoUpgrade Snapshot <span class="sb-caret">▾</span></div>
+    </div>
+
+    <div class="sb-section">
+      <div class="sb-section-head">Lab 4: Capture and Preserve SQL <span class="sb-caret">▾</span></div>
+    </div>
+
+    <div class="sb-section">
+      <div class="sb-section-head">Lab 5: AutoUpgrade <span class="sb-caret">▾</span></div>
+    </div>
+
+    <div class="sb-section">
+      <div class="sb-section-head">Lab 6: AWR Compare Periods <span class="sb-caret">▾</span></div>
+    </div>
+
+    <div class="sb-section">
+      <div class="sb-section-head">Lab 7: SQL Performance Analyzer <span class="sb-caret">▾</span></div>
+    </div>
+
+    <div class="sb-section">
+      <div class="sb-section-head">Lab 8: SQL Plan Management <span class="sb-caret">▾</span></div>
+    </div>
+
+    <div class="sb-section">
+      <div class="sb-section-head">Lab 9: SQL Tuning Advisor <span class="sb-caret">▾</span></div>
+    </div>
+
+    <div class="sb-section">
+      <div class="sb-section-head">Lab 10: Upgrade CDB and Init torc Using CDB Fleet <span class="sb-caret">▾</span></div>
+    </div>
+
+    <div class="sb-section">
+      <div class="sb-section-head">Lab 11: Upgrade Non-CDB Using Homogeneous Clone PDB <span class="sb-caret">▾</span></div>
+    </div>
+
+    <div class="sb-section">
+      <div class="sb-section-head">Lab 12: Migrate Using Data Pump <span class="sb-caret">▾</span></div>
+    </div>
+
+    <div class="sb-section">
+      <div class="sb-section-head">Lab 13: Migrate Using Full Transportable Export/Import <span class="sb-caret">▾</span></div>
+    </div>
+
+    <div class="sb-section">
+      <div class="sb-section-head">Lab 14: Upgrade Encrypted Non-CDB and CDB Convert <span class="sb-caret">▾</span></div>
+    </div>
+
+    <div class="sb-section">
+      <div class="sb-section-head">Lab 15: Downgrade a PDB <span class="sb-caret">▾</span></div>
+    </div>
+
+    <div class="sb-section">
+      <div class="sb-section-head">Need Help? <span class="sb-caret">▾</span></div>
+    </div>
+
+  </aside>
+
+  <!-- ── CONTENT ── -->
+  <main class="content">
+
+    <div class="content-inner">
+      <h1>Introduction</h1>
+
+      <h2>About this Workshop</h2>
+
+      <div class="workshop-meta">
+        <span>⏱ Estimated Workshop Time: 120 minutes</span>
+      </div>
+
+      <p>Oracle AI Database 26ai is a <a href="#">Long Term Support Release</a>. This lab combines several upgrade and migration methods, and equips you with performance features and tools to ensure stability when you move to any new Oracle AI Database release. By upgrading to Oracle AI Database 26ai, you will have Premier Support until the end of 2031 and Extended Support for a period thereafter. There is a direct upgrade path to Oracle AI Database 26ai from Oracle Database 19c and 21c, regardless of the Release Update applied. From Oracle Database 25ai, you simply patch your database to update to Oracle AI Database 26ai.</p>
+
+      <h3>Objectives</h3>
+      <p>In this workshop, you will:</p>
+      <ul>
+        <li>Upgrade databases</li>
+        <li>Use Performance Stability Prescription to ensure performance stability</li>
+        <li>Convert to multitenant architecture</li>
+        <li>Migrate databases using Data Pump and transportable tablespaces</li>
+      </ul>
+
+      <button class="collapse-btn">— Collapse All Tasks</button>
+
+      <div class="section-toggle">
+        <span class="toggle-icon">—</span>
+        <span>About the workshop contents</span>
+      </div>
+
+      <p>This workshop comes with pre-installed Oracle homes and pre-created databases. You can switch between environments with the shortcuts shown in the last column of the below diagram.</p>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Database</th>
+            <th>PDBs</th>
+            <th>Set environment</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Oracle Database 19c</strong><br><small>db19 — /u01/app/oracle/product/19</small></td>
+            <td>UPGR<br>FTEX<br>CDB19</td>
+            <td><span class="env-tag">upgr</span><br><span class="env-tag">ftex</span><br><span class="env-tag">cdb19</span></td>
+          </tr>
+          <tr>
+            <td><strong>Oracle Database 21c</strong><br><small>db21 — /u01/app/oracle/product/21</small></td>
+            <td>CDB21</td>
+            <td><span class="env-tag">cdb21</span></td>
+          </tr>
+          <tr>
+            <td><strong>Oracle Database 25ai</strong><br><small>db25 — /u01/app/oracle/product/25</small></td>
+            <td>CDB26<br>CDB26COM<br>CDB26RES</td>
+            <td><span class="env-tag">cdb26</span><br><span class="env-tag">cdb26come</span><br><span class="env-tag">cdb26res</span></td>
+          </tr>
+          <tr>
+            <td><strong>Oracle AI Database 26ai</strong><br><small>db26 — /u01/app/oracle/product/26</small></td>
+            <td>CDB26<br>CDB26COM<br>CDB26RES</td>
+            <td><span class="env-tag">cdb26</span><br><span class="env-tag">cdb26come</span><br><span class="env-tag">cdb26res</span></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p>The lab contains 15 labs.</p>
+
+      <div class="labs-table">
+        <div class="labs-table-head">Labs</div>
+        <div class="labs-grid">
+          <div class="labs-col0">
+            <div class="labs-col0-cell">1 &nbsp; 2</div>
+          </div>
+          <div class="labs-tracks">
+            <div class="labs-track-row">
+              <div class="track-label">Track 1</div>
+              <div class="track-labs">
+                <div class="lab-num current">3</div>
+                <div class="lab-num">4</div>
+                <div class="lab-num">5</div>
+                <div class="lab-num">6</div>
+                <div class="lab-num">7</div>
+                <div class="lab-num">8</div>
+                <div class="lab-num">9</div>
+              </div>
+            </div>
+            <div class="labs-track-row">
+              <div class="track-label">Track 2</div>
+              <div class="track-labs">
+                <div class="lab-num">10</div>
+                <div class="lab-num">15</div>
+              </div>
+            </div>
+            <div class="labs-track-row">
+              <div class="track-label">Track 3</div>
+              <div class="track-labs">
+                <div class="lab-num">11</div>
+                <div class="lab-num">12</div>
+                <div class="lab-num">13</div>
+              </div>
+            </div>
+          </div>
+          <div class="labs-col0" style="border-left:1px solid #ccc;border-right:none;">
+            <div class="labs-col0-cell">14</div>
+          </div>
+        </div>
+      </div>
+
+      <ul>
+        <li>You start by completing labs 1 and 2.</li>
+        <li>Track 1 is the primary track. You should focus on labs 3 to 9.</li>
+        <li>When time allows, you can work on tracks 2 and 3.</li>
+        <li>In tracks 2 and 3, the order of the individual labs don't matter. You can perform the labs in any order, but only one lab from one track at a time.</li>
+        <li>As the last lab, you can perform lab 14.</li>
+      </ul>
+
+      <div class="section-toggle" style="margin-top:24px;">
+        <span class="toggle-icon">—</span>
+        <span>Upgrade and data migration methods and processes</span>
+      </div>
+
+      <h3>AutoUpgrade</h3>
+      <p>AutoUpgrade is the only recommended tool to upgrade Oracle AI Database. Whether you want to upgrade only one or thousands of databases, AutoUpgrade performs not only the upgrade but also all the pre and post-upgrade tasks. It can upgrade many databases in parallel and allows all sorts of customizations needed in today's complex environments. Furthermore, AutoUpgrade can also plug your database into a precreated CDB and does the conversion of a non-CDB into a PDB fully unattended. AutoUpgrade works on all supported platforms, for non-CDB and CDB, or for only selected pluggable databases.</p>
+
+      <h3>Migrating data using Oracle Data Pump</h3>
+      <p>Oracle Data Pump provides export and import capabilities. Oracle Data Pump can perform a full or partial export from your database, followed by a full or partial import into the new release of Oracle AI Database. Data Pump allows to migrate directly into PDBs as well and works independently of the source database version across versions and operating systems platforms. In addition, Data Pump in conjunction with transportable tablespaces takes away the complexity of rebuilding all the metadata objects with just one command as Full Transportable Export/Import.</p>
+
+      <p>You may now <a href="#">proceed to the next lab</a>.</p>
+
+      <div class="section-toggle" style="margin-top:24px;">
+        <span class="toggle-icon">—</span>
+        <span>Learn More</span>
+      </div>
+      <ul>
+        <li>Documentation, <a href="#">Database Upgrade Guide</a></li>
+        <li>Blog, <a href="#">Upgrade your Databases - NOW!</a></li>
+        <li>My Oracle Support, <a href="#">Release Schedule of Current Database Releases (Doc ID 742060.1)</a></li>
+      </ul>
+
+      <div class="section-toggle" style="margin-top:24px;">
+        <span class="toggle-icon">—</span>
+        <span>Acknowledgements</span>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<script>
+  let done = false;
+
+  function markDone() {
+    done = !done;
+    const btn    = document.getElementById('markDoneBtn');
+    const fill   = document.getElementById('js-fill');
+    const counter = document.getElementById('js-counter');
+
+    if (done) {
+      btn.textContent = '✓ Complete';
+      btn.classList.add('completed');
+      fill.style.width = '33.3%'; // 2 of 6
+      counter.innerHTML = '<strong>2 of 6</strong> complete';
+    } else {
+      btn.textContent = '✓ Mark Complete';
+      btn.classList.remove('completed');
+      fill.style.width = '16.6%'; // 1 of 6
+      counter.innerHTML = '<strong>1 of 6</strong> complete';
+    }
+  }
+
+  // Sidebar toggles
+  document.querySelectorAll('.sb-section-head').forEach(head => {
+    head.addEventListener('click', () => {
+      const section = head.parentElement;
+      section.classList.toggle('open');
+      const links = section.querySelectorAll('.sb-link');
+      links.forEach(l => {
+        l.style.display = section.classList.contains('open') ? 'flex' : 'none';
+      });
+    });
+  });
+
+  // Hide all but first section's links initially
+  document.querySelectorAll('.sb-section:not(.open) .sb-link').forEach(l => {
+    l.style.display = 'none';
+  });
+</script>
+</body>
+</html>
