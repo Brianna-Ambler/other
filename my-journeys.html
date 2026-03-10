@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Journeys — Oracle LiveLabs</title>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --oracle-red:    #C74634;
+  --oracle-red-h:  #A5392A;
+  --nav-bg:        #1A1A1A;
+  --journey-gold:  #E8A830;
+  --journey-bg:    #192634;
+  --done-green:    #2E7D32;
+  --done-bg:       #E8F5E9;
+  --inprogress-bg: #E8F0FE;
+  --inprogress:    #1565C0;
+  --text-dark:     #1A1A1A;
+  --text-mid:      #555;
+  --text-light:    #888;
+  --border:        #E0E0E0;
+  --bg-light:      #F7F8FA;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Open Sans', Arial, sans-serif; font-size: 13px; color: var(--text-dark); background: var(--bg-light); }
+
+/* ── NAV ── */
+.top-nav { background: var(--nav-bg); height: 44px; display: flex; align-items: center; padding: 0 24px; gap: 12px; position: sticky; top: 0; z-index: 100; }
+.nav-logo { display: flex; align-items: center; gap: 6px; text-decoration: none; }
+.nav-logo-box { background: var(--oracle-red); color: #fff; padding: 2px 7px; border-radius: 2px; font-size: 12px; font-weight: 700; }
+.nav-search { flex: 1; max-width: 640px; background: #fff; border: none; border-radius: 3px; padding: 6px 12px; font-size: 12.5px; font-family: inherit; outline: none; color: #333; }
+.nav-search::placeholder { color: #aaa; }
+.nav-right { margin-left: auto; display: flex; align-items: center; gap: 14px; }
+.nav-link { color: rgba(255,255,255,0.82); text-decoration: none; font-size: 12px; display: flex; align-items: center; gap: 5px; }
+.nav-link:hover { color: #fff; }
+.user-menu-wrap { position: relative; }
+.user-btn { background: none; border: none; cursor: pointer; color: rgba(255,255,255,0.85); font-size: 12px; font-family: inherit; display: flex; align-items: center; gap: 6px; padding: 4px 8px; border-radius: 3px; transition: background .15s; }
+.user-btn:hover { background: rgba(255,255,255,0.1); }
+.user-dropdown { display: none; position: absolute; top: calc(100% + 6px); right: 0; background: #fff; border: 1px solid #ddd; border-radius: 6px; box-shadow: 0 6px 24px rgba(0,0,0,0.14); min-width: 200px; z-index: 200; overflow: hidden; }
+.user-dropdown.open { display: block; }
+.user-dropdown a { display: flex; align-items: center; gap: 9px; padding: 10px 16px; font-size: 13px; color: #333; text-decoration: none; transition: background .15s; }
+.user-dropdown a:hover { background: #f5f5f5; }
+.user-dropdown a.active { background: #f0f4ff; color: var(--inprogress); font-weight: 600; }
+.udrop-divider { height: 1px; background: #eee; margin: 4px 0; }
+
+/* ── PAGE HEADER ── */
+.page-header { background: var(--journey-bg); border-bottom: 2px solid var(--journey-gold); padding: 28px 32px 24px; }
+.page-header-inner { max-width: 1080px; margin: 0 auto; }
+.page-breadcrumb { font-size: 12px; color: rgba(255,255,255,0.45); margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+.page-breadcrumb a { color: rgba(255,255,255,0.55); text-decoration: none; }
+.page-breadcrumb a:hover { color: rgba(255,255,255,0.85); text-decoration: underline; }
+.page-header h1 { font-size: 24px; font-weight: 700; color: #fff; letter-spacing: -0.3px; margin-bottom: 6px; }
+.page-header p { font-size: 13px; color: rgba(255,255,255,0.55); }
+.stat-chips { display: flex; gap: 14px; margin-top: 18px; flex-wrap: wrap; }
+.stat-chip { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12); border-radius: 5px; padding: 10px 18px; display: flex; flex-direction: column; gap: 2px; }
+.chip-num { font-size: 22px; font-weight: 700; color: #fff; letter-spacing: -1px; line-height: 1; }
+.chip-label { font-size: 11px; color: rgba(255,255,255,0.45); text-transform: uppercase; letter-spacing: 0.6px; }
+
+/* ── BODY ── */
+.page-body { max-width: 1080px; margin: 0 auto; padding: 28px 32px 60px; }
+
+/* ── SECTION HEADERS ── */
+.section-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; margin-top: 36px; }
+.section-head:first-child { margin-top: 0; }
+.section-title { font-size: 16px; font-weight: 700; color: var(--text-dark); display: flex; align-items: center; gap: 8px; }
+.stag { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 20px; }
+.stag-green { background: var(--done-bg); color: var(--done-green); }
+.stag-blue  { background: var(--inprogress-bg); color: var(--inprogress); }
+.stag-grey  { background: #f0f0f0; color: #666; }
+.section-link { font-size: 12.5px; color: var(--oracle-red); text-decoration: none; font-weight: 600; }
+.section-link:hover { text-decoration: underline; }
+
+/* ── JOURNEY CARDS ── */
+.jcards-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+@media(max-width: 860px) { .jcards-grid { grid-template-columns: repeat(2,1fr); } }
+
+.jcard { background: #fff; border: 1px solid var(--border); border-radius: 8px; overflow: visible; text-decoration: none; color: inherit; display: block; transition: box-shadow .2s, transform .2s; position: relative; }
+.jcard:hover { box-shadow: 0 5px 20px rgba(0,0,0,0.09); transform: translateY(-2px); }
+
+.jcard-top { padding: 16px 16px 14px; display: flex; align-items: flex-start; gap: 12px; }
+
+/* Card icon — SVG-based circles, no emojis */
+.jcard-icon { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.ji-db   { background: rgba(232,168,48,.15);  color: #A07010; }
+.ji-ai   { background: rgba(90,171,170,.15);  color: #2E8080; }
+.ji-sec  { background: rgba(60,130,200,.15);  color: #1565C0; }
+.ji-cloud{ background: rgba(199,70,52,.15);   color: #A03020; }
+.ji-data { background: rgba(80,180,100,.15);  color: #2E7D32; }
+.ji-devop{ background: rgba(130,150,180,.15); color: #4A6080; }
+
+.jcard-info { flex: 1; min-width: 0; }
+.jcard-title { font-size: 13px; font-weight: 700; color: var(--text-dark); margin-bottom: 4px; line-height: 1.35; }
+.jcard-meta  { font-size: 11.5px; color: var(--text-light); }
+
+/* Bottom strip — in-progress cards only */
+.jcard-status { padding: 10px 16px; border-top: 1px solid #f0f0f0; display: flex; align-items: center; gap: 10px; }
+.jcard-track { flex: 1; height: 5px; background: #e8e8e8; border-radius: 3px; overflow: hidden; }
+.jcard-fill { height: 100%; border-radius: 3px; }
+.fill-blue { background: linear-gradient(90deg, #1565C0, #42A5F5); }
+.jcard-pct { font-size: 11.5px; font-weight: 700; color: var(--inprogress); white-space: nowrap; }
+.jcard-badge { font-size: 10.5px; font-weight: 600; padding: 2px 8px; border-radius: 20px; white-space: nowrap; }
+.badge-done   { background: var(--done-bg); color: var(--done-green); }
+.badge-active { background: var(--inprogress-bg); color: var(--inprogress); }
+
+/* Completed card footer — pill + share button, NO progress bar */
+.jcard-footer { padding: 10px 16px; border-top: 1px solid #f0f0f0; display: flex; align-items: center; justify-content: space-between; }
+
+/* Green check in corner */
+.complete-tick { position: absolute; top: 12px; right: 12px; width: 22px; height: 22px; border-radius: 50%; background: var(--done-green); color: #fff; display: flex; align-items: center; justify-content: center; }
+
+/* Share button + popover */
+.share-wrap { position: relative; }
+.share-btn {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: none; border: 1px solid var(--border);
+  border-radius: 4px; padding: 4px 10px;
+  font-size: 11.5px; font-weight: 600; color: var(--text-mid);
+  cursor: pointer; font-family: inherit; transition: background .15s, border-color .15s;
+}
+.share-btn:hover { background: #f5f5f5; border-color: #bbb; }
+.share-popover {
+  display: none; position: absolute; bottom: calc(100% + 6px); right: 0;
+  background: #fff; border: 1px solid #ddd; border-radius: 6px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12); min-width: 178px;
+  z-index: 300; overflow: hidden;
+}
+.share-popover.open { display: block; }
+.share-option {
+  display: flex; align-items: center; gap: 9px;
+  padding: 10px 14px; font-size: 12.5px; color: #333;
+  text-decoration: none; cursor: pointer;
+  background: none; border: none; width: 100%; text-align: left;
+  font-family: inherit; transition: background .15s;
+}
+.share-option:hover { background: #f5f5f5; }
+.share-option svg { flex-shrink: 0; }
+.share-divider { height: 1px; background: #eee; }
+.copy-confirm { display: none; font-size: 11px; color: var(--done-green); margin-left: 4px; }
+
+/* ── RECOMMENDATIONS — mixed list ── */
+.rec-list { display: flex; flex-direction: column; gap: 10px; }
+.rec-card {
+  background: #fff; border: 1px solid var(--border); border-radius: 8px;
+  padding: 14px 16px; display: flex; align-items: center; gap: 14px;
+  text-decoration: none; color: inherit;
+  transition: box-shadow .18s, transform .18s;
+}
+.rec-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.08); transform: translateY(-1px); }
+.rec-icon-wrap { width: 38px; height: 38px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.ri-journey { background: rgba(25,38,52,0.08); }
+.ri-workshop { background: rgba(199,70,52,0.08); }
+.rec-info { flex: 1; min-width: 0; }
+.rec-type-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.7px; margin-bottom: 3px; }
+.rec-type-journey  { color: #4A6080; }
+.rec-type-workshop { color: var(--oracle-red); }
+.rec-title { font-size: 13px; font-weight: 700; color: var(--text-dark); margin-bottom: 3px; line-height: 1.3; }
+.rec-desc  { font-size: 12px; color: var(--text-light); margin-bottom: 5px; }
+.rec-tags  { display: flex; gap: 6px; flex-wrap: wrap; }
+.rec-tag   { font-size: 11px; color: var(--text-light); background: #f0f0f0; padding: 1px 7px; border-radius: 3px; }
+.rec-cta {
+  flex-shrink: 0; display: inline-flex; align-items: center; gap: 6px;
+  background: var(--oracle-red); color: #fff;
+  padding: 7px 16px; border-radius: 4px;
+  font-size: 12px; font-weight: 600; white-space: nowrap;
+}
+.rec-card:hover .rec-cta { background: var(--oracle-red-h); }
+
+/* ── FOOTER ── */
+footer { background: #F0F0F0; border-top: 1px solid #ddd; padding: 32px 32px 16px; }
+.fgrid { display: flex; gap: 28px; flex-wrap: wrap; max-width: 1080px; margin: 0 auto 22px; justify-content: space-between; }
+.fcol h4 { font-size: 12px; font-weight: 700; color: var(--text-dark); margin-bottom: 10px; text-transform: uppercase; letter-spacing: .5px; }
+.fcol a { display: block; font-size: 12.5px; color: var(--oracle-red); text-decoration: none; margin-bottom: 6px; }
+.fcol a:hover { text-decoration: underline; }
+.fbot { border-top: 1px solid #ccc; padding-top: 14px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; max-width: 1080px; margin: 0 auto; font-size: 11.5px; color: #888; }
+.fbot a { color: #888; text-decoration: none; margin-left: 14px; }
+.fbot .apex { color: var(--oracle-red) !important; }
+</style>
+</head>
+<body>
+
+<!-- SVG icon defs (reusable) -->
+<svg style="display:none" xmlns="http://www.w3.org/2000/svg">
+  <symbol id="ico-user" viewBox="0 0 16 16" fill="none">
+    <circle cx="8" cy="5" r="3" stroke="currentColor" stroke-width="1.4"/>
+    <path d="M2 14c0-3.314 2.686-5 6-5s6 1.686 6 5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+  </symbol>
+  <symbol id="ico-chevron-down" viewBox="0 0 10 10" fill="none">
+    <path d="M2 3.5L5 6.5L8 3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+  </symbol>
+  <symbol id="ico-reservations" viewBox="0 0 14 14" fill="none">
+    <rect x="2" y="2" width="10" height="10" rx="1.5" stroke="currentColor" stroke-width="1.3"/>
+    <path d="M4.5 7h5M7 4.5v5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+  </symbol>
+  <symbol id="ico-journeys" viewBox="0 0 14 14" fill="none">
+    <path d="M2 7h10M7 2l5 5-5 5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+  </symbol>
+  <symbol id="ico-faq" viewBox="0 0 14 14" fill="none">
+    <circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.3"/>
+    <path d="M5.5 5.5a1.5 1.5 0 013 .5c0 1-1.5 1.5-1.5 2.5M7 10.5v.1" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+  </symbol>
+  <symbol id="ico-feedback" viewBox="0 0 14 14" fill="none">
+    <path d="M2 4h10v6a1 1 0 01-1 1H3a1 1 0 01-1-1V4z" stroke="currentColor" stroke-width="1.3"/>
+    <path d="M2 4l5 4 5-4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+  </symbol>
+  <symbol id="ico-dashboard" viewBox="0 0 14 14" fill="none">
+    <rect x="2" y="2" width="4" height="4" rx="1" stroke="currentColor" stroke-width="1.3"/>
+    <rect x="8" y="2" width="4" height="4" rx="1" stroke="currentColor" stroke-width="1.3"/>
+    <rect x="2" y="8" width="4" height="4" rx="1" stroke="currentColor" stroke-width="1.3"/>
+    <rect x="8" y="8" width="4" height="4" rx="1" stroke="currentColor" stroke-width="1.3"/>
+  </symbol>
+  <symbol id="ico-signout" viewBox="0 0 14 14" fill="none">
+    <path d="M9 2h3v10H9M6 10l4-3-4-3M2 7h7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+  </symbol>
+  <symbol id="ico-check" viewBox="0 0 12 12" fill="none">
+    <path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+  </symbol>
+  <symbol id="ico-share" viewBox="0 0 14 14" fill="none">
+    <circle cx="11" cy="3" r="1.5" stroke="currentColor" stroke-width="1.2"/>
+    <circle cx="11" cy="11" r="1.5" stroke="currentColor" stroke-width="1.2"/>
+    <circle cx="3"  cy="7" r="1.5" stroke="currentColor" stroke-width="1.2"/>
+    <path d="M4.4 6.2l5.2-2.8M4.4 7.8l5.2 2.8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+  </symbol>
+  <symbol id="ico-copy" viewBox="0 0 14 14" fill="none">
+    <rect x="4" y="4" width="8" height="8" rx="1.2" stroke="currentColor" stroke-width="1.3"/>
+    <path d="M2 10V3a1 1 0 011-1h7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+  </symbol>
+  <symbol id="ico-linkedin" viewBox="0 0 14 14" fill="none">
+    <rect x="1.5" y="1.5" width="11" height="11" rx="2" stroke="currentColor" stroke-width="1.3"/>
+    <path d="M4 6v4M4 4.5v.1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+    <path d="M7 10V7.5A1.5 1.5 0 0110 7.5V10" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+  </symbol>
+  <!-- Card type icons -->
+  <symbol id="ico-database" viewBox="0 0 20 20" fill="none">
+    <ellipse cx="10" cy="5" rx="7" ry="2.5" stroke="currentColor" stroke-width="1.5"/>
+    <path d="M3 5v10c0 1.38 3.13 2.5 7 2.5s7-1.12 7-2.5V5" stroke="currentColor" stroke-width="1.5"/>
+    <path d="M3 10c0 1.38 3.13 2.5 7 2.5s7-1.12 7-2.5" stroke="currentColor" stroke-width="1.5"/>
+  </symbol>
+  <symbol id="ico-cpu" viewBox="0 0 20 20" fill="none">
+    <rect x="5" y="5" width="10" height="10" rx="1.5" stroke="currentColor" stroke-width="1.5"/>
+    <path d="M8 5V3M12 5V3M8 17v-2M12 17v-2M5 8H3M5 12H3M17 8h-2M17 12h-2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+    <rect x="8" y="8" width="4" height="4" rx="0.5" stroke="currentColor" stroke-width="1.3"/>
+  </symbol>
+  <symbol id="ico-lock" viewBox="0 0 20 20" fill="none">
+    <rect x="4" y="9" width="12" height="9" rx="2" stroke="currentColor" stroke-width="1.5"/>
+    <path d="M7 9V6a3 3 0 016 0v3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+    <circle cx="10" cy="13.5" r="1.5" fill="currentColor"/>
+  </symbol>
+  <symbol id="ico-cloud" viewBox="0 0 20 20" fill="none">
+    <path d="M5.5 14a3.5 3.5 0 01-.5-7 5 5 0 019.9-1A3.5 3.5 0 0115.5 14H5.5z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+  </symbol>
+  <symbol id="ico-chart" viewBox="0 0 20 20" fill="none">
+    <path d="M3 15h14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+    <rect x="4" y="9" width="3" height="6" rx="0.5" stroke="currentColor" stroke-width="1.3"/>
+    <rect x="9" y="5" width="3" height="10" rx="0.5" stroke="currentColor" stroke-width="1.3"/>
+    <rect x="14" y="7" width="3" height="8" rx="0.5" stroke="currentColor" stroke-width="1.3"/>
+  </symbol>
+  <symbol id="ico-code" viewBox="0 0 20 20" fill="none">
+    <path d="M7 7l-4 3 4 3M13 7l4 3-4 3M11 5l-2 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </symbol>
+  <symbol id="ico-book" viewBox="0 0 20 20" fill="none">
+    <path d="M4 3h9a1 1 0 011 1v12a1 1 0 01-1 1H4V3z" stroke="currentColor" stroke-width="1.5"/>
+    <path d="M14 4h1a1 1 0 011 1v11a1 1 0 01-1 1h-1" stroke="currentColor" stroke-width="1.5"/>
+    <path d="M7 8h5M7 11h3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+  </symbol>
+  <symbol id="ico-arrow-right" viewBox="0 0 14 14" fill="none">
+    <path d="M2 7h10M7 2l5 5-5 5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+  </symbol>
+</svg>
+
+<!-- ── TOP NAV ── -->
+<header class="top-nav">
+  <a href="https://brianna-ambler.github.io/other/livelabs-homepage.html" class="nav-logo">
+    <span class="nav-logo-box">LiveLabs</span>
+  </a>
+  <input class="nav-search" type="text" placeholder="Search for workshops and sprints…">
+  <div class="nav-right">
+    <a href="#" class="nav-link">
+      <svg width="14" height="14"><use href="#ico-dashboard"/></svg>
+      Event Code
+    </a>
+    <div class="user-menu-wrap">
+      <button class="user-btn" onclick="toggleUserMenu()">
+        <svg width="16" height="16"><use href="#ico-user"/></svg>
+        brianna.a.ambler@oracle.com
+        <svg width="10" height="10"><use href="#ico-chevron-down"/></svg>
+      </button>
+      <div class="user-dropdown" id="userDropdown">
+        <a href="#">
+          <svg width="14" height="14" style="color:#555"><use href="#ico-reservations"/></svg>
+          My Reservations
+        </a>
+        <a href="#" class="active">
+          <svg width="14" height="14" style="color:#1565C0"><use href="#ico-journeys"/></svg>
+          My Journeys
+        </a>
+        <a href="#">
+          <svg width="14" height="14" style="color:#555"><use href="#ico-faq"/></svg>
+          FAQ
+        </a>
+        <a href="#">
+          <svg width="14" height="14" style="color:#555"><use href="#ico-feedback"/></svg>
+          Feedback
+        </a>
+        <a href="#">
+          <svg width="14" height="14" style="color:#555"><use href="#ico-dashboard"/></svg>
+          Dashboard
+        </a>
+        <div class="udrop-divider"></div>
+        <a href="#">
+          <svg width="14" height="14" style="color:#555"><use href="#ico-signout"/></svg>
+          Sign Out
+        </a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ── PAGE HEADER ── -->
+<div class="page-header">
+  <div class="page-header-inner">
+    <div class="page-breadcrumb">
+      <a href="https://brianna-ambler.github.io/other/livelabs-homepage.html">LiveLabs</a>
+      <span>›</span>
+      <span>My Journeys</span>
+    </div>
+    <h1>My Journeys</h1>
+    <p>Track your learning progress across all Oracle LiveLabs Journeys.</p>
+    <div class="stat-chips">
+      <div class="stat-chip">
+        <span class="chip-num">1</span>
+        <span class="chip-label">Completed</span>
+      </div>
+      <div class="stat-chip">
+        <span class="chip-num">2</span>
+        <span class="chip-label">In Progress</span>
+      </div>
+      <div class="stat-chip">
+        <span class="chip-num">9</span>
+        <span class="chip-label">Workshops Done</span>
+      </div>
+      <div class="stat-chip">
+        <span class="chip-num">~18 hrs</span>
+        <span class="chip-label">Time Invested</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── BODY ── -->
+<div class="page-body">
+
+  <!-- COMPLETED -->
+  <div class="section-head">
+    <div class="section-title">
+      Completed <span class="stag stag-green">1</span>
+    </div>
+  </div>
+  <div class="jcards-grid" style="margin-bottom:0;">
+    <div class="jcard completed">
+      <!-- Green check tick -->
+      <div class="complete-tick">
+        <svg width="12" height="12" style="color:#fff"><use href="#ico-check"/></svg>
+      </div>
+      <a href="https://brianna-ambler.github.io/other/journey-landing-page.html" style="text-decoration:none;color:inherit;display:block;">
+        <div class="jcard-top">
+          <div class="jcard-icon ji-db">
+            <svg width="20" height="20"><use href="#ico-database"/></svg>
+          </div>
+          <div class="jcard-info">
+            <div class="jcard-title">Oracle Database Fundamentals</div>
+            <div class="jcard-meta">6 workshops &middot; ~12 hrs &middot; Beginner</div>
+          </div>
+        </div>
+      </a>
+      <div class="jcard-footer">
+        <span class="jcard-badge badge-done">Complete</span>
+        <div class="share-wrap">
+          <button class="share-btn" onclick="toggleShare(event,'share-db')">
+            <svg width="13" height="13"><use href="#ico-share"/></svg>
+            Share
+          </button>
+          <div class="share-popover" id="share-db">
+            <button class="share-option" onclick="copyLink(event,'share-db')">
+              <svg width="14" height="14" style="color:#555"><use href="#ico-copy"/></svg>
+              Copy Link
+              <span class="copy-confirm" id="confirm-db">Copied!</span>
+            </button>
+            <div class="share-divider"></div>
+            <a class="share-option" href="https://www.linkedin.com/sharing/share-offsite/?url=https%3A%2F%2Fbrianna-ambler.github.io%2Fother%2Fjourney-landing-page.html&summary=I+just+completed+Oracle+Database+Fundamentals+on+Oracle+LiveLabs" target="_blank" rel="noopener">
+              <svg width="14" height="14" style="color:#0077B5"><use href="#ico-linkedin"/></svg>
+              Share on LinkedIn
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- IN PROGRESS -->
+  <div class="section-head">
+    <div class="section-title">
+      In Progress <span class="stag stag-blue">2</span>
+    </div>
+    <a href="https://brianna-ambler.github.io/other/livelabs-homepage.html" class="section-link">Browse All Journeys</a>
+  </div>
+  <div class="jcards-grid">
+    <a href="https://brianna-ambler.github.io/other/journey-landing-page.html" class="jcard">
+      <div class="jcard-top">
+        <div class="jcard-icon ji-ai">
+          <svg width="20" height="20"><use href="#ico-cpu"/></svg>
+        </div>
+        <div class="jcard-info">
+          <div class="jcard-title">Generative AI Developer Path</div>
+          <div class="jcard-meta">8 workshops &middot; ~16 hrs &middot; Intermediate</div>
+        </div>
+      </div>
+      <div class="jcard-status">
+        <div class="jcard-track"><div class="jcard-fill fill-blue" style="width:37.5%"></div></div>
+        <span class="jcard-pct">3 / 8</span>
+        <span class="jcard-badge badge-active">In Progress</span>
+      </div>
+    </a>
+    <a href="https://brianna-ambler.github.io/other/journey-landing-page.html" class="jcard">
+      <div class="jcard-top">
+        <div class="jcard-icon ji-sec">
+          <svg width="20" height="20"><use href="#ico-lock"/></svg>
+        </div>
+        <div class="jcard-info">
+          <div class="jcard-title">Cloud Security Essentials</div>
+          <div class="jcard-meta">7 workshops &middot; ~14 hrs &middot; Advanced</div>
+        </div>
+      </div>
+      <div class="jcard-status">
+        <div class="jcard-track"><div class="jcard-fill fill-blue" style="width:28.5%"></div></div>
+        <span class="jcard-pct">2 / 7</span>
+        <span class="jcard-badge badge-active">In Progress</span>
+      </div>
+    </a>
+  </div>
+
+  <!-- RECOMMENDED -->
+  <div class="section-head">
+    <div class="section-title">
+      Recommended For You
+      <span class="stag stag-grey">Based on your activity</span>
+    </div>
+    <a href="https://brianna-ambler.github.io/other/livelabs-homepage.html" class="section-link">View All</a>
+  </div>
+  <div class="rec-list">
+
+    <!-- Journey rec -->
+    <a href="https://brianna-ambler.github.io/other/journey-landing-page.html" class="rec-card">
+      <div class="rec-icon-wrap ri-journey">
+        <svg width="22" height="22" style="color:#2A4A6A"><use href="#ico-cloud"/></svg>
+      </div>
+      <div class="rec-info">
+        <div class="rec-type-label rec-type-journey">Journey</div>
+        <div class="rec-title">OCI Cloud Architecture</div>
+        <div class="rec-desc">Design and deploy scalable, secure infrastructure using Oracle Cloud best practices.</div>
+        <div class="rec-tags">
+          <span class="rec-tag">10 workshops</span>
+          <span class="rec-tag">~20 hrs</span>
+          <span class="rec-tag">Advanced</span>
+          <span class="rec-tag">Cert Prep</span>
+        </div>
+      </div>
+      <span class="rec-cta">
+        Start Journey
+        <svg width="12" height="12" style="color:#fff"><use href="#ico-arrow-right"/></svg>
+      </span>
+    </a>
+
+    <!-- Workshop rec -->
+    <a href="https://brianna-ambler.github.io/other/livelabs-workshop-page.html" class="rec-card">
+      <div class="rec-icon-wrap ri-workshop">
+        <svg width="22" height="22" style="color:#A03020"><use href="#ico-database"/></svg>
+      </div>
+      <div class="rec-info">
+        <div class="rec-type-label rec-type-workshop">Workshop</div>
+        <div class="rec-title">Hitchhiker's Guide for Upgrading to Oracle AI Database</div>
+        <div class="rec-desc">Upgrade and migrate your database to the latest Oracle AI Database release using AutoUpgrade and Data Pump.</div>
+        <div class="rec-tags">
+          <span class="rec-tag">6 hrs</span>
+          <span class="rec-tag">Intermediate</span>
+          <span class="rec-tag">Database</span>
+        </div>
+      </div>
+      <span class="rec-cta">
+        Start Workshop
+        <svg width="12" height="12" style="color:#fff"><use href="#ico-arrow-right"/></svg>
+      </span>
+    </a>
+
+    <!-- Journey rec -->
+    <a href="https://brianna-ambler.github.io/other/journey-landing-page.html" class="rec-card">
+      <div class="rec-icon-wrap ri-journey">
+        <svg width="22" height="22" style="color:#2E6040"><use href="#ico-chart"/></svg>
+      </div>
+      <div class="rec-info">
+        <div class="rec-type-label rec-type-journey">Journey</div>
+        <div class="rec-title">Data Science &amp; Analytics</div>
+        <div class="rec-desc">Explore OCI Data Science, AutoML, and Oracle Analytics Cloud to derive insights from large datasets.</div>
+        <div class="rec-tags">
+          <span class="rec-tag">5 workshops</span>
+          <span class="rec-tag">~10 hrs</span>
+          <span class="rec-tag">Intermediate</span>
+        </div>
+      </div>
+      <span class="rec-cta">
+        Start Journey
+        <svg width="12" height="12" style="color:#fff"><use href="#ico-arrow-right"/></svg>
+      </span>
+    </a>
+
+    <!-- Workshop rec -->
+    <a href="https://brianna-ambler.github.io/other/livelabs-workshop-page.html" class="rec-card">
+      <div class="rec-icon-wrap ri-workshop">
+        <svg width="22" height="22" style="color:#A03020"><use href="#ico-code"/></svg>
+      </div>
+      <div class="rec-info">
+        <div class="rec-type-label rec-type-workshop">Workshop</div>
+        <div class="rec-title">Build a GenAI-Powered Application with Oracle AI</div>
+        <div class="rec-desc">Build real-world GenAI apps using Oracle AI Database, OCI Generative AI, and multicloud connectors.</div>
+        <div class="rec-tags">
+          <span class="rec-tag">2 hrs</span>
+          <span class="rec-tag">Intermediate</span>
+          <span class="rec-tag">AI / GenAI</span>
+        </div>
+      </div>
+      <span class="rec-cta">
+        Start Workshop
+        <svg width="12" height="12" style="color:#fff"><use href="#ico-arrow-right"/></svg>
+      </span>
+    </a>
+
+    <!-- Journey rec -->
+    <a href="https://brianna-ambler.github.io/other/journey-landing-page.html" class="rec-card">
+      <div class="rec-icon-wrap ri-journey">
+        <svg width="22" height="22" style="color:#3A4A6A"><use href="#ico-code"/></svg>
+      </div>
+      <div class="rec-info">
+        <div class="rec-type-label rec-type-journey">Journey</div>
+        <div class="rec-title">DevOps &amp; Cloud Native</div>
+        <div class="rec-desc">Build CI/CD pipelines, containerize applications, and deploy microservices on OCI Kubernetes Engine.</div>
+        <div class="rec-tags">
+          <span class="rec-tag">9 workshops</span>
+          <span class="rec-tag">~18 hrs</span>
+          <span class="rec-tag">Intermediate</span>
+        </div>
+      </div>
+      <span class="rec-cta">
+        Start Journey
+        <svg width="12" height="12" style="color:#fff"><use href="#ico-arrow-right"/></svg>
+      </span>
+    </a>
+
+  </div>
+</div>
+
+<!-- ── FOOTER ── -->
+<footer>
+  <div class="fgrid">
+    <div class="fcol">
+      <h4>Resources</h4>
+      <a href="#">Developers</a><a href="#">Startups</a><a href="#">Students &amp; Educators</a>
+    </div>
+    <div class="fcol">
+      <h4>Partners</h4>
+      <a href="#">Oracle PartnerNetwork</a><a href="#">Find a Partner</a><a href="#">Log in to OPN</a>
+    </div>
+    <div class="fcol">
+      <h4>Solutions</h4>
+      <a href="#">Artificial Intelligence</a><a href="#">Internet of Things</a><a href="#">Blockchain</a>
+    </div>
+    <div class="fcol">
+      <h4>What's New</h4>
+      <a href="#">Oracle's response to COVID-19</a><a href="#">Java SE download</a><a href="#">Try Oracle Cloud Free Tier</a>
+    </div>
+    <div class="fcol">
+      <h4>Contact Us</h4>
+      <a href="#">US Sales: +1.800.633.0738</a><a href="#">How can we help?</a><a href="#">Subscribe to emails</a>
+    </div>
+  </div>
+  <div class="fbot">
+    <span>Release 2026.01.15 &nbsp;&middot;&nbsp; Built with &hearts; using <a href="#" class="apex">Oracle APEX</a></span>
+    <div>
+      <a href="#">&copy; 2026 Oracle</a>
+      <a href="#">Terms of Use &amp; Privacy</a>
+      <a href="#">Cookie Preferences</a>
+      <a href="#">Ad Choices</a>
+    </div>
+  </div>
+</footer>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+  /* User dropdown */
+  function toggleUserMenu() {
+    document.getElementById('userDropdown').classList.toggle('open');
+  }
+  document.addEventListener('click', function(e) {
+    const wrap = document.querySelector('.user-menu-wrap');
+    if (wrap && !wrap.contains(e.target)) document.getElementById('userDropdown').classList.remove('open');
+  });
+
+  /* Share popover */
+  function toggleShare(e, id) {
+    e.stopPropagation();
+    const popover = document.getElementById(id);
+    const isOpen = popover.classList.contains('open');
+    // Close all popovers first
+    document.querySelectorAll('.share-popover').forEach(p => p.classList.remove('open'));
+    if (!isOpen) popover.classList.add('open');
+  }
+  document.addEventListener('click', function() {
+    document.querySelectorAll('.share-popover').forEach(p => p.classList.remove('open'));
+  });
+
+  /* Copy link */
+  function copyLink(e, popoverId) {
+    e.stopPropagation();
+    const url = 'https://brianna-ambler.github.io/other/journey-landing-page.html';
+    navigator.clipboard.writeText(url).catch(() => {
+      const ta = document.createElement('textarea');
+      ta.value = url; document.body.appendChild(ta);
+      ta.select(); document.execCommand('copy');
+      document.body.removeChild(ta);
+    });
+    const confirmId = popoverId.replace('share-', 'confirm-');
+    const confirmEl = document.getElementById(confirmId);
+    if (confi
