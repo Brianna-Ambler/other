@@ -456,12 +456,12 @@ body { font-family: 'Open Sans', Arial, sans-serif; font-size: 13px; color: var(
   <span class="js-label">Journey</span>
   <span class="js-name">Oracle Database Fundamentals</span>
   <span class="js-divider">·</span>
-  <span class="js-workshop-num">Workshop 5 of 6</span>
+  <span class="js-workshop-num">Workshop 6 of 6</span>
   <span class="js-divider">·</span>
 
   <div class="js-progress">
-    <div class="js-track"><div class="js-fill" id="js-fill" style="width:66.6%"></div></div>
-    <span class="js-counter" id="js-counter"><strong>4 of 6</strong> complete</span>
+    <div class="js-track"><div class="js-fill" id="js-fill" style="width:83.3%"></div></div>
+    <span class="js-counter" id="js-counter"><strong>5 of 6</strong> complete</span>
   </div>
   <button class="mark-done-btn" id="markDoneBtn" onclick="markDone()">✓ Mark Complete</button>
 </div>
@@ -755,11 +755,11 @@ body { font-family: 'Open Sans', Arial, sans-serif; font-size: 13px; color: var(
 </div>
 
 <script>
-  // Workshop state — workshop 5 of 6, mark complete → next workshop
+  // Workshop state — workshop 6 of 6 (last), mark complete → celebration dialog
   const TOTAL = 6;
-  const CURRENT = 5;
+  const CURRENT = 6;
   const IS_LAST = (CURRENT === TOTAL);
-  const NEXT_URL = 'https://brianna-ambler.github.io/other/livelabs-workshop-landing.html';
+  const NEXT_URL = 'https://brianna-ambler.github.io/other/livelabs-workshop-page.html';
 
   let done = false;
 
@@ -773,8 +773,8 @@ body { font-family: 'Open Sans', Arial, sans-serif; font-size: 13px; color: var(
 
     btn.textContent = '✓ Complete';
     btn.classList.add('completed');
-    fill.style.width = '83.3%'; // 5 of 6
-    counter.innerHTML = `<strong>5 of 6</strong> complete`;
+    fill.style.width = '100%';
+    counter.innerHTML = `<strong>${TOTAL} of ${TOTAL}</strong> complete`;
 
     // Brief pause so user sees the completed state, then act
     setTimeout(() => {
