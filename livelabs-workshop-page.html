@@ -820,4 +820,15 @@ body { font-family: 'Open Sans', Arial, sans-serif; font-size: 13px; color: var(
       section.classList.toggle('open');
       const links = section.querySelectorAll('.sb-link');
       links.forEach(l => {
-       
+        l.style.display = section.classList.contains('open') ? 'flex' : 'none';
+      });
+    });
+  });
+
+  // Hide all but first section's links initially
+  document.querySelectorAll('.sb-section:not(.open) .sb-link').forEach(l => {
+    l.style.display = 'none';
+  });
+</script>
+</body>
+</html>
