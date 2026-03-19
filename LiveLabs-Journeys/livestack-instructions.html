@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Hitchhiker's Guide for Upgrading to Oracle AI Database — LiveLabs</title>
+<title>LiveLabs LiveStack — Working with AI Agents that remember using Oracle AI Database — LiveLabs</title>
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -285,12 +285,12 @@ body { font-family: 'Open Sans', Arial, sans-serif; font-size: 13px; color: var(
 .sb-check { font-size: 11px; color: var(--done-green); flex-shrink: 0; }
 
 /* ── CONTENT ── */
-.content {
-  flex: 1; overflow-y: auto; padding: 0;
-  background: #fff;
+
+/* ── IFRAME ── */
+.ls-iframe {
+  flex: 1; width: 100%; height: 100%;
+  border: none; display: block;
 }
-.content::-webkit-scrollbar { width: 6px; }
-.content::-webkit-scrollbar-thumb { background: #ddd; border-radius: 3px; }
 
 /* Mark complete button — lives in the journey strip header */
 .mark-done-btn {
@@ -468,7 +468,7 @@ body { font-family: 'Open Sans', Arial, sans-serif; font-size: 13px; color: var(
       </button>
       <div class="user-dropdown" id="userDropdown">
         <a href="#"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="2" y="2" width="10" height="10" rx="2" stroke="#555" stroke-width="1.3"/><path d="M5 7h4M7 5v4" stroke="#555" stroke-width="1.3" stroke-linecap="round"/></svg> My Reservations</a>
-        <a href="https://brianna-ambler.github.io/other/my-journeys.html"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7h10M7 2l5 5-5 5" stroke="#555" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg> My Journeys</a>
+        <a href="my-journeys.html"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7h10M7 2l5 5-5 5" stroke="#555" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg> My Journeys</a>
         <a href="#"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5" stroke="#555" stroke-width="1.3"/><path d="M7 5v2.5l1.5 1.5" stroke="#555" stroke-width="1.3" stroke-linecap="round"/></svg> FAQ</a>
         <a href="#"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 10l2-2 2 2 4-4" stroke="#555" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg> Feedback</a>
         <a href="#"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="2" y="2" width="4" height="4" rx="1" stroke="#555" stroke-width="1.3"/><rect x="8" y="2" width="4" height="4" rx="1" stroke="#555" stroke-width="1.3"/><rect x="2" y="8" width="4" height="4" rx="1" stroke="#555" stroke-width="1.3"/><rect x="8" y="8" width="4" height="4" rx="1" stroke="#555" stroke-width="1.3"/></svg> Dashboard</a>
@@ -486,21 +486,38 @@ body { font-family: 'Open Sans', Arial, sans-serif; font-size: 13px; color: var(
     Back to Journey
   </a>
   <span class="js-label">Journey</span>
-  <span class="js-name">Oracle Database Fundamentals</span>
+  <span class="js-name">Generative AI Developer</span>
   <span class="js-divider">·</span>
-  <span class="js-workshop-num">Workshop 6 of 6</span>
+  <span class="js-workshop-num">Workshop 1 of 1</span>
   <span class="js-divider">·</span>
 
   <div class="js-progress">
-    <div class="js-track"><div class="js-fill" id="js-fill" style="width:83.3%"></div></div>
-    <span class="js-counter" id="js-counter"><strong>5 of 6</strong> complete</span>
+    <div class="js-track"><div class="js-fill" id="js-fill" style="width:0%"></div></div>
+    <span class="js-counter" id="js-counter"><strong>0 of 1</strong> complete</span>
   </div>
   <button class="mark-done-btn" id="markDoneBtn" onclick="markDone()">✓ Mark Complete</button>
+  <div class="share-wrap" id="ws-share-wrap" style="display:none; margin-left:8px;">
+    <button class="mark-done-btn completed" style="background:#f0f0f0;color:#333;border:1px solid #ccc;" onclick="toggleWsShare(event)">
+      <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><circle cx="11" cy="3" r="1.5" stroke="currentColor" stroke-width="1.2"/><circle cx="11" cy="11" r="1.5" stroke="currentColor" stroke-width="1.2"/><circle cx="3" cy="7" r="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M4.4 6.2l5.2-2.8M4.4 7.8l5.2 2.8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+      Share
+    </button>
+    <div class="share-popover" id="ws-share-popover">
+      <button class="share-option" onclick="wsShareCopy(event)">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="4" y="4" width="8" height="8" rx="1.2" stroke="#555" stroke-width="1.3"/><path d="M2 10V3a1 1 0 011-1h7" stroke="#555" stroke-width="1.3" stroke-linecap="round"/></svg>
+        Copy Link<span class="copy-confirm" id="ws-copy-confirm">Copied!</span>
+      </button>
+      <div class="share-divider"></div>
+      <a class="share-option" href="https://www.linkedin.com/sharing/share-offsite/?url=livelabs-workshop-page.html" target="_blank" rel="noopener">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1.5" y="1.5" width="11" height="11" rx="2" stroke="#0077B5" stroke-width="1.3"/><path d="M4 6v4M4 4.5v.1" stroke="#0077B5" stroke-width="1.4" stroke-linecap="round"/><path d="M7 10V7.5A1.5 1.5 0 0110 7.5V10" stroke="#0077B5" stroke-width="1.3" stroke-linecap="round"/></svg>
+        Share on LinkedIn
+      </a>
+    </div>
+  </div>
 </div>
 
 <!-- ── BREADCRUMB ── -->
 <div class="breadcrumb-bar">
-  <a href="#">Hitchhiker's Guide for Upgrading to Oracle AI Database</a>
+  <a href="#">LiveLabs LiveStack — Working with AI Agents that remember using Oracle AI Database</a>
   <span>›</span>
   <span class="bc-current">Introduction</span>
   <div class="bc-icons">
@@ -512,234 +529,46 @@ body { font-family: 'Open Sans', Arial, sans-serif; font-size: 13px; color: var(
 
 <!-- ── PAGE BODY ── -->
 <div class="page-body">
+  <iframe
+    src="https://oracle-livelabs.github.io/livestack/big-star-retail-ai-agent/guide/workshops/tenancy/"
+    class="ls-iframe"
+    title="Working with AI Agents that remember using Oracle AI Database"
+    allow="fullscreen"
+  ></iframe>
+</div>
 
-  <!-- ── SIDEBAR ── -->
-  <aside class="sidebar">
-
-    <div class="sb-section open">
-      <div class="sb-section-head">Introduction <span class="sb-caret">▾</span></div>
-      <a href="#" class="sb-link active"><span class="sb-dot active-dot"></span>About the Workshop</a>
-      <a href="#" class="sb-link"><span class="sb-dot"></span>About the workshop contents</a>
-      <a href="#" class="sb-link"><span class="sb-dot"></span>Upgrade and data migration methods and processes</a>
-      <a href="#" class="sb-link"><span class="sb-dot"></span>Learn More</a>
-      <a href="#" class="sb-link"><span class="sb-dot"></span>Acknowledgements</a>
-    </div>
-
-    <div class="sb-section">
-      <div class="sb-section-head" style="color:#2E7D32;">✓ Get Started <span class="sb-caret">▾</span></div>
-    </div>
-
-    <div class="sb-section">
-      <div class="sb-section-head">Lab 1: Initialize Environment <span class="sb-caret">▾</span></div>
-    </div>
-
-    <div class="sb-section">
-      <div class="sb-section-head">Lab 2: Explore Multitenant Architecture <span class="sb-caret">▾</span></div>
-    </div>
-
-    <div class="sb-section">
-      <div class="sb-section-head">Lab 3: Generate AutoUpgrade Snapshot <span class="sb-caret">▾</span></div>
-    </div>
-
-    <div class="sb-section">
-      <div class="sb-section-head">Lab 4: Capture and Preserve SQL <span class="sb-caret">▾</span></div>
-    </div>
-
-    <div class="sb-section">
-      <div class="sb-section-head">Lab 5: AutoUpgrade <span class="sb-caret">▾</span></div>
-    </div>
-
-    <div class="sb-section">
-      <div class="sb-section-head">Lab 6: AWR Compare Periods <span class="sb-caret">▾</span></div>
-    </div>
-
-    <div class="sb-section">
-      <div class="sb-section-head">Lab 7: SQL Performance Analyzer <span class="sb-caret">▾</span></div>
-    </div>
-
-    <div class="sb-section">
-      <div class="sb-section-head">Lab 8: SQL Plan Management <span class="sb-caret">▾</span></div>
-    </div>
-
-    <div class="sb-section">
-      <div class="sb-section-head">Lab 9: SQL Tuning Advisor <span class="sb-caret">▾</span></div>
-    </div>
-
-    <div class="sb-section">
-      <div class="sb-section-head">Lab 10: Upgrade CDB and Init torc Using CDB Fleet <span class="sb-caret">▾</span></div>
-    </div>
-
-    <div class="sb-section">
-      <div class="sb-section-head">Lab 11: Upgrade Non-CDB Using Homogeneous Clone PDB <span class="sb-caret">▾</span></div>
-    </div>
-
-    <div class="sb-section">
-      <div class="sb-section-head">Lab 12: Migrate Using Data Pump <span class="sb-caret">▾</span></div>
-    </div>
-
-    <div class="sb-section">
-      <div class="sb-section-head">Lab 13: Migrate Using Full Transportable Export/Import <span class="sb-caret">▾</span></div>
-    </div>
-
-    <div class="sb-section">
-      <div class="sb-section-head">Lab 14: Upgrade Encrypted Non-CDB and CDB Convert <span class="sb-caret">▾</span></div>
-    </div>
-
-    <div class="sb-section">
-      <div class="sb-section-head">Lab 15: Downgrade a PDB <span class="sb-caret">▾</span></div>
-    </div>
-
-    <div class="sb-section">
-      <div class="sb-section-head">Need Help? <span class="sb-caret">▾</span></div>
-    </div>
-
-  </aside>
-
-  <!-- ── CONTENT ── -->
-  <main class="content">
-
-    <div class="content-inner">
-      <h1>Introduction</h1>
-
-      <h2>About this Workshop</h2>
-
-      <div class="workshop-meta">
-        <span>⏱ Estimated Workshop Time: 120 minutes</span>
-      </div>
-
-      <p>Oracle AI Database 26ai is a <a href="#">Long Term Support Release</a>. This lab combines several upgrade and migration methods, and equips you with performance features and tools to ensure stability when you move to any new Oracle AI Database release. By upgrading to Oracle AI Database 26ai, you will have Premier Support until the end of 2031 and Extended Support for a period thereafter. There is a direct upgrade path to Oracle AI Database 26ai from Oracle Database 19c and 21c, regardless of the Release Update applied. From Oracle Database 25ai, you simply patch your database to update to Oracle AI Database 26ai.</p>
-
-      <h3>Objectives</h3>
-      <p>In this workshop, you will:</p>
-      <ul>
-        <li>Upgrade databases</li>
-        <li>Use Performance Stability Prescription to ensure performance stability</li>
-        <li>Convert to multitenant architecture</li>
-        <li>Migrate databases using Data Pump and transportable tablespaces</li>
-      </ul>
-
-      <button class="collapse-btn">— Collapse All Tasks</button>
-
-      <div class="section-toggle">
-        <span class="toggle-icon">—</span>
-        <span>About the workshop contents</span>
-      </div>
-
-      <p>This workshop comes with pre-installed Oracle homes and pre-created databases. You can switch between environments with the shortcuts shown in the last column of the below diagram.</p>
-
-      <table>
-        <thead>
-          <tr>
-            <th>Database</th>
-            <th>PDBs</th>
-            <th>Set environment</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><strong>Oracle Database 19c</strong><br><small>db19 — /u01/app/oracle/product/19</small></td>
-            <td>UPGR<br>FTEX<br>CDB19</td>
-            <td><span class="env-tag">upgr</span><br><span class="env-tag">ftex</span><br><span class="env-tag">cdb19</span></td>
-          </tr>
-          <tr>
-            <td><strong>Oracle Database 21c</strong><br><small>db21 — /u01/app/oracle/product/21</small></td>
-            <td>CDB21</td>
-            <td><span class="env-tag">cdb21</span></td>
-          </tr>
-          <tr>
-            <td><strong>Oracle Database 25ai</strong><br><small>db25 — /u01/app/oracle/product/25</small></td>
-            <td>CDB26<br>CDB26COM<br>CDB26RES</td>
-            <td><span class="env-tag">cdb26</span><br><span class="env-tag">cdb26come</span><br><span class="env-tag">cdb26res</span></td>
-          </tr>
-          <tr>
-            <td><strong>Oracle AI Database 26ai</strong><br><small>db26 — /u01/app/oracle/product/26</small></td>
-            <td>CDB26<br>CDB26COM<br>CDB26RES</td>
-            <td><span class="env-tag">cdb26</span><br><span class="env-tag">cdb26come</span><br><span class="env-tag">cdb26res</span></td>
-          </tr>
-        </tbody>
-      </table>
-
-      <p>The lab contains 15 labs.</p>
-
-      <div class="labs-table">
-        <div class="labs-table-head">Labs</div>
-        <div class="labs-grid">
-          <div class="labs-col0">
-            <div class="labs-col0-cell">1 &nbsp; 2</div>
-          </div>
-          <div class="labs-tracks">
-            <div class="labs-track-row">
-              <div class="track-label">Track 1</div>
-              <div class="track-labs">
-                <div class="lab-num current">3</div>
-                <div class="lab-num">4</div>
-                <div class="lab-num">5</div>
-                <div class="lab-num">6</div>
-                <div class="lab-num">7</div>
-                <div class="lab-num">8</div>
-                <div class="lab-num">9</div>
-              </div>
-            </div>
-            <div class="labs-track-row">
-              <div class="track-label">Track 2</div>
-              <div class="track-labs">
-                <div class="lab-num">10</div>
-                <div class="lab-num">15</div>
-              </div>
-            </div>
-            <div class="labs-track-row">
-              <div class="track-label">Track 3</div>
-              <div class="track-labs">
-                <div class="lab-num">11</div>
-                <div class="lab-num">12</div>
-                <div class="lab-num">13</div>
-              </div>
-            </div>
-          </div>
-          <div class="labs-col0" style="border-left:1px solid #ccc;border-right:none;">
-            <div class="labs-col0-cell">14</div>
-          </div>
+<!-- ── NEXT WORKSHOP DIALOG ── -->
+<div class="next-dialog-overlay" id="nextDialog">
+  <div class="next-dialog">
+    <div class="nd-header">
+      <button class="nd-close" onclick="closeNextDialog()">×</button>
+      <div class="nd-header-top">
+        <div class="nd-icon">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M5 10l4 4 6-7" stroke="#E8A830" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div>
+          <h2>Workshop Complete!</h2>
+          <p>You've finished this workshop in the LiveLabs LiveStack journey.</p>
         </div>
       </div>
-
-      <ul>
-        <li>You start by completing labs 1 and 2.</li>
-        <li>Track 1 is the primary track. You should focus on labs 3 to 9.</li>
-        <li>When time allows, you can work on tracks 2 and 3.</li>
-        <li>In tracks 2 and 3, the order of the individual labs don't matter. You can perform the labs in any order, but only one lab from one track at a time.</li>
-        <li>As the last lab, you can perform lab 14.</li>
-      </ul>
-
-      <div class="section-toggle" style="margin-top:24px;">
-        <span class="toggle-icon">—</span>
-        <span>Upgrade and data migration methods and processes</span>
+      <div class="nd-next-card">
+        <div class="nd-next-num">6</div>
+        <div class="nd-next-info">
+          <div class="nd-next-title">Explore additional LiveLabs LiveStack workshops</div>
+          <div class="nd-next-meta">Next in journey</div>
+        </div>
       </div>
-
-      <h3>AutoUpgrade</h3>
-      <p>AutoUpgrade is the only recommended tool to upgrade Oracle AI Database. Whether you want to upgrade only one or thousands of databases, AutoUpgrade performs not only the upgrade but also all the pre and post-upgrade tasks. It can upgrade many databases in parallel and allows all sorts of customizations needed in today's complex environments. Furthermore, AutoUpgrade can also plug your database into a precreated CDB and does the conversion of a non-CDB into a PDB fully unattended. AutoUpgrade works on all supported platforms, for non-CDB and CDB, or for only selected pluggable databases.</p>
-
-      <h3>Migrating data using Oracle Data Pump</h3>
-      <p>Oracle Data Pump provides export and import capabilities. Oracle Data Pump can perform a full or partial export from your database, followed by a full or partial import into the new release of Oracle AI Database. Data Pump allows to migrate directly into PDBs as well and works independently of the source database version across versions and operating systems platforms. In addition, Data Pump in conjunction with transportable tablespaces takes away the complexity of rebuilding all the metadata objects with just one command as Full Transportable Export/Import.</p>
-
-      <p>You may now <a href="#">proceed to the next lab</a>.</p>
-
-      <div class="section-toggle" style="margin-top:24px;">
-        <span class="toggle-icon">—</span>
-        <span>Learn More</span>
-      </div>
-      <ul>
-        <li>Documentation, <a href="#">Database Upgrade Guide</a></li>
-        <li>Blog, <a href="#">Upgrade your Databases - NOW!</a></li>
-        <li>My Oracle Support, <a href="#">Release Schedule of Current Database Releases (Doc ID 742060.1)</a></li>
-      </ul>
-
-      <div class="section-toggle" style="margin-top:24px;">
-        <span class="toggle-icon">—</span>
-        <span>Acknowledgements</span>
-      </div>
-
     </div>
-  </main>
+    <div class="nd-body">
+      <div class="nd-actions">
+        <button class="nd-btn nd-btn-secondary" onclick="closeNextDialog()">Stay on this page</button>
+        <a href="livelabs-workshop-landing.html" class="nd-btn nd-btn-primary">
+          Go to Next Workshop
+          <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M2 7h10M7 2l5 5-5 5" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- ── SUCCESS DIALOG ── -->
@@ -749,27 +578,14 @@ body { font-family: 'Open Sans', Arial, sans-serif; font-size: 13px; color: var(
       <button class="dialog-close" onclick="closeDialog()">×</button>
       <span class="dialog-trophy">🏆</span>
       <h2>Journey Complete!</h2>
-      <p>You've finished <strong>Oracle Database Fundamentals</strong>. Excellent work.</p>
+          <p>You've finished the <strong>LiveLabs LiveStack workshop</strong>. Excellent work.</p>
     </div>
     <div class="dialog-body">
       <div class="dialog-actions">
-        <div class="share-wrap" style="flex:1;">
-          <button class="dialog-btn" style="width:100%" onclick="toggleSuccessShare(event)">
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="11" cy="3" r="1.5" stroke="#555" stroke-width="1.3"/><circle cx="11" cy="11" r="1.5" stroke="#555" stroke-width="1.3"/><circle cx="3" cy="7" r="1.5" stroke="#555" stroke-width="1.3"/><path d="M4.4 6.2l5.2-2.8M4.4 7.8l5.2 2.8" stroke="#555" stroke-width="1.3" stroke-linecap="round"/></svg>
-            Share Accomplishment
-          </button>
-          <div class="share-popover" id="success-share-popover" style="bottom:auto;top:calc(100% + 6px);left:0;right:auto;">
-            <button class="share-option" onclick="successShareCopy(event)">
-              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="4" y="4" width="8" height="8" rx="1.2" stroke="#555" stroke-width="1.3"/><path d="M2 10V3a1 1 0 011-1h7" stroke="#555" stroke-width="1.3" stroke-linecap="round"/></svg>
-              Copy Link<span class="copy-confirm" id="success-copy-confirm">Copied!</span>
-            </button>
-            <div class="share-divider"></div>
-            <a class="share-option" href="https://www.linkedin.com/sharing/share-offsite/?url=https%3A%2F%2Fbrianna-ambler.github.io%2Fother%2Fjourney-landing-page.html&summary=I+just+completed+Oracle+Database+Fundamentals+on+Oracle+LiveLabs%21" target="_blank" rel="noopener">
-              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1.5" y="1.5" width="11" height="11" rx="2" stroke="#0077B5" stroke-width="1.3"/><path d="M4 6v4M4 4.5v.1" stroke="#0077B5" stroke-width="1.4" stroke-linecap="round"/><path d="M7 10V7.5A1.5 1.5 0 0110 7.5V10" stroke="#0077B5" stroke-width="1.3" stroke-linecap="round"/></svg>
-              Share on LinkedIn
-            </a>
-          </div>
-        </div>
+        <button class="dialog-btn" onclick="shareAccomplishment()">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="11" cy="3" r="1.5" stroke="#555" stroke-width="1.3"/><circle cx="11" cy="11" r="1.5" stroke="#555" stroke-width="1.3"/><circle cx="3" cy="7" r="1.5" stroke="#555" stroke-width="1.3"/><path d="M4.4 6.2l5.2-2.8M4.4 7.8l5.2 2.8" stroke="#555" stroke-width="1.3" stroke-linecap="round"/></svg>
+          Share Accomplishment
+        </button>
         <a href="#" class="dialog-btn primary">
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7h10M7 2l5 5-5 5" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
           Speak to Sales
@@ -778,33 +594,33 @@ body { font-family: 'Open Sans', Arial, sans-serif; font-size: 13px; color: var(
 
       <div class="dialog-section-label">Recommended Journeys</div>
       <div class="dialog-rec-cards">
-        <a href="https://brianna-ambler.github.io/other/journey-landing-page.html" class="dialog-rec-card">
+        <a href="journey-landing-page.html" class="dialog-rec-card">
           <span class="dialog-rec-icon">🤖</span>
-          <div class="dialog-rec-title">Generative AI Developer Path</div>
+          <div class="dialog-rec-title">Generative AI Developer</div>
           <div class="dialog-rec-meta">8 workshops · ~16 hrs</div>
         </a>
-        <a href="https://brianna-ambler.github.io/other/journey-landing-page.html" class="dialog-rec-card">
+        <a href="journey-landing-page.html" class="dialog-rec-card">
           <span class="dialog-rec-icon">☁️</span>
           <div class="dialog-rec-title">OCI Cloud Architecture</div>
           <div class="dialog-rec-meta">10 workshops · ~20 hrs</div>
         </a>
-        <a href="https://brianna-ambler.github.io/other/journey-landing-page.html" class="dialog-rec-card">
+        <a href="journey-landing-page.html" class="dialog-rec-card">
           <span class="dialog-rec-icon">🔐</span>
           <div class="dialog-rec-title">Cloud Security Essentials</div>
           <div class="dialog-rec-meta">7 workshops · ~14 hrs</div>
         </a>
       </div>
-      <a href="https://brianna-ambler.github.io/other/livelabs-homepage.html" class="dialog-view-all">View All Journeys →</a>
+      <a href="livelabs-homepage.html" class="dialog-view-all">View All Journeys →</a>
     </div>
   </div>
 </div>
 
 <script>
-  // Workshop state — workshop 6 of 6 (last), mark complete → celebration dialog
-  const TOTAL = 6;
-  const CURRENT = 6;
+  // Workshop state — single workshop page
+  const TOTAL = 1;
+  const CURRENT = 1;
   const IS_LAST = (CURRENT === TOTAL);
-  const NEXT_URL = 'https://brianna-ambler.github.io/other/livelabs-workshop-page.html';
+  const NEXT_URL = 'livelabs-workshop-landing.html';
 
   let done = false;
 
@@ -818,45 +634,60 @@ body { font-family: 'Open Sans', Arial, sans-serif; font-size: 13px; color: var(
 
     btn.textContent = '✓ Complete';
     btn.classList.add('completed');
-    fill.style.width = '100%';
-    counter.innerHTML = `<strong>${TOTAL} of ${TOTAL}</strong> complete`;
+    fill.style.width = '100%'; // 1 of 1
+    counter.innerHTML = `<strong>1 of 1</strong> complete`;
 
-    // Brief pause so user sees the completed state, then act
+    // Brief pause so user sees the completed state, then show dialog
     setTimeout(() => {
       if (IS_LAST) {
         document.getElementById('successDialog').classList.add('open');
       } else {
-        window.location.href = NEXT_URL;
+        document.getElementById('nextDialog').classList.add('open');
       }
+      // Show share button after completing
+      document.getElementById('ws-share-wrap').style.display = 'inline-block';
     }, 700);
   }
+
+  function closeNextDialog() {
+    document.getElementById('nextDialog').classList.remove('open');
+  }
+
+  function toggleWsShare(e) {
+    e.stopPropagation();
+    const p = document.getElementById('ws-share-popover');
+    p.classList.toggle('open');
+  }
+
+  function wsShareCopy(e) {
+    e.stopPropagation();
+    const url = window.location.href;
+    navigator.clipboard.writeText(url).catch(() => {
+      const ta = document.createElement('textarea');
+      ta.value = url; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+    });
+    const el = document.getElementById('ws-copy-confirm');
+    el.style.display = 'inline';
+    setTimeout(() => { el.style.display = 'none'; document.getElementById('ws-share-popover').classList.remove('open'); }, 1500);
+  }
+
+  document.addEventListener('click', function() {
+    const p = document.getElementById('ws-share-popover');
+    if (p) p.classList.remove('open');
+  });
 
   function closeDialog() {
     document.getElementById('successDialog').classList.remove('open');
   }
 
-  function toggleSuccessShare(e) {
-    e.stopPropagation();
-    const p = document.getElementById('success-share-popover');
-    p.classList.toggle('open');
+  function shareAccomplishment() {
+    const text = 'I just completed the LiveLabs LiveStack workshop on Oracle LiveLabs! 🏆 #OracleLiveLabs #OracleAIDatabase';
+    if (navigator.share) {
+      navigator.share({ title: 'Oracle Journey Complete', text });
+    } else {
+      window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`, '_blank');
+    }
   }
-
-  function successShareCopy(e) {
-    e.stopPropagation();
-    const url = 'https://brianna-ambler.github.io/other/journey-landing-page.html';
-    navigator.clipboard.writeText(url).catch(() => {
-      const ta = document.createElement('textarea');
-      ta.value = url; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
-    });
-    const el = document.getElementById('success-copy-confirm');
-    el.style.display = 'inline';
-    setTimeout(() => { el.style.display = 'none'; document.getElementById('success-share-popover').classList.remove('open'); }, 1500);
-  }
-
-  document.addEventListener('click', function() {
-    const p = document.getElementById('success-share-popover');
-    if (p) p.classList.remove('open');
-  });
 
   // Close dialog on overlay click
   document.getElementById('successDialog').addEventListener('click', function(e) {

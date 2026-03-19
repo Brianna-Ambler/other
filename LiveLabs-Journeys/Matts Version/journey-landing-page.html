@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Generative AI Developer — Oracle LiveLabs Journeys</title>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --oracle-red:       #C74634;
+  --oracle-red-hover: #A5392A;
+  --rule-gold:        #C8882A;
+  --workshop-card-bg: #2A3142;
+  --footer-bg:        #F0F0F0;
+  --footer-link:      #C74634;
+  --text-dark:        #1A1A1A;
+  --text-mid:         #444444;
+  --text-light:       #777777;
+  --border:           #DDDDDD;
+  --bg-page:          #F4F4F2;   /* exact warm grey from screenshot */
+  --bg-white:         #FFFFFF;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Open Sans', Arial, sans-serif;
+  color: var(--text-dark);
+  background: var(--bg-page);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+/* ── NAV (identical to homepage) ── */
+.top-bar {
+  background: #1A1A1A;
+  padding: 0 20px;
+  display: flex; align-items: center;
+  justify-content: space-between; height: 44px;
+  position: sticky; top: 0; z-index: 100;
+}
+.top-bar-logo { display: flex; align-items: center; gap: 0; text-decoration: none; }
+.logo-livelabs-nav {
+  font-size: 15px; font-weight: 700; color: #fff;
+  letter-spacing: -0.2px;
+}
+.logo-livelabs-nav span { color: #E05040; }
+.nav-search {
+  flex: 1; max-width: 700px; margin: 0 24px;
+  background: #fff; border: none; border-radius: 3px;
+  display: flex; align-items: center; overflow: hidden;
+}
+.nav-search input {
+  flex: 1; border: none; outline: none; padding: 7px 12px;
+  font-size: 12.5px; font-family: inherit; color: #333;
+}
+.nav-search input::placeholder { color: #aaa; }
+.nav-right { display: flex; align-items: center; gap: 18px; }
+.nav-right a { color: rgba(255,255,255,.8); text-decoration: none; font-size: 12.5px; font-weight: 600; }
+.nav-right a:hover { color: #fff; }
+.nav-right .signin { color: #fff; }
+/* User dropdown */
+.user-menu-wrap { position: relative; }
+.user-btn { background: none; border: none; cursor: pointer; color: rgba(255,255,255,0.85); font-size: 12px; font-family: inherit; display: flex; align-items: center; gap: 6px; padding: 4px 8px; border-radius: 3px; transition: background .15s; }
+.user-btn:hover { background: rgba(255,255,255,0.1); }
+.user-dropdown { display: none; position: absolute; top: calc(100% + 6px); right: 0; background: #fff; border: 1px solid #ddd; border-radius: 6px; box-shadow: 0 6px 24px rgba(0,0,0,0.14); min-width: 200px; z-index: 200; overflow: hidden; }
+.user-dropdown.open { display: block; }
+.user-dropdown a { display: flex; align-items: center; gap: 9px; padding: 10px 16px; font-size: 13px; color: #333; text-decoration: none; transition: background .15s; }
+.user-dropdown a:hover { background: #f5f5f5; }
+.udrop-divider { height: 1px; background: #eee; margin: 4px 0; }
+
+/* ── BREADCRUMB ── */
+.breadcrumb {
+  max-width: 960px; margin: 0 auto;
+  padding: 14px 20px 0;
+  font-size: 12px; color: var(--text-light);
+}
+.breadcrumb a { color: var(--oracle-red); text-decoration: none; }
+.breadcrumb a:hover { text-decoration: underline; }
+.breadcrumb span { margin: 0 5px; color: #bbb; }
+
+/* ── MAIN CONTENT WRAPPER ── */
+.page-wrap {
+  max-width: 960px; margin: 0 auto;
+  padding: 18px 20px 60px;
+}
+
+/* ── PAGE TITLE ROW ── */
+.title-row {
+  display: flex; align-items: flex-start;
+  justify-content: space-between; gap: 16px;
+  margin-bottom: 18px; flex-wrap: wrap;
+}
+.title-row h1 {
+  font-size: 20px; font-weight: 700; color: var(--text-dark);
+  letter-spacing: -.3px; line-height: 1.25; flex: 1;
+}
+.journey-badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: #E8F4F3; color: #2E7D78;
+  font-size: 10px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .7px; padding: 3px 9px; border-radius: 3px;
+  border: 1px solid #B8D8D6; margin-bottom: 6px;
+}
+.title-actions { display: flex; gap: 8px; align-items: center; flex-shrink: 0; }
+.btn-share {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: #fff; border: 1px solid #ccc; color: #444;
+  padding: 7px 14px; border-radius: 4px; font-size: 12.5px;
+  font-weight: 600; cursor: pointer; font-family: inherit;
+  transition: border-color .2s, color .2s;
+}
+.btn-share:hover { border-color: #999; color: #222; }
+.share-wrap { position: relative; display: inline-block; }
+.share-popover { display: none; position: absolute; top: calc(100% + 6px); right: 0; background: #fff; border: 1px solid #ddd; border-radius: 6px; box-shadow: 0 4px 16px rgba(0,0,0,0.12); min-width: 170px; z-index: 400; overflow: hidden; }
+.share-popover.open { display: block; }
+.share-option { display: flex; align-items: center; gap: 9px; padding: 10px 14px; font-size: 12.5px; color: #333; text-decoration: none; cursor: pointer; background: none; border: none; width: 100%; text-align: left; font-family: inherit; transition: background .15s; }
+.share-option:hover { background: #f5f5f5; }
+.copy-confirm { display: none; font-size: 11px; color: #2E7D32; margin-left: auto; }
+.btn-start {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: var(--oracle-red); color: #fff;
+  padding: 7px 18px; border-radius: 4px; font-size: 12.5px;
+  font-weight: 700; cursor: pointer; border: none; font-family: inherit;
+  transition: background .2s; text-decoration: none;
+}
+.btn-start:hover { background: var(--oracle-red-hover); }
+
+/* ── TWO-COLUMN LAYOUT ── */
+.content-grid {
+  display: grid;
+  grid-template-columns: 1fr 280px;
+  gap: 20px;
+  align-items: start;
+}
+@media (max-width: 720px) { .content-grid { grid-template-columns: 1fr; } }
+
+/* ── LEFT COLUMN ── */
+.left-col {}
+
+/* Journey visual banner */
+.journey-banner {
+  width: 100%; height: 240px;
+  background: linear-gradient(135deg, #0F2027 0%, #203A43 50%, #2C5364 100%);
+  border-radius: 4px; overflow: hidden; position: relative;
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 20px;
+}
+.banner-pattern {
+  position: absolute; inset: 0;
+  background-image: radial-gradient(circle at 20% 50%, rgba(90,171,170,.25) 0%, transparent 50%),
+                    radial-gradient(circle at 80% 30%, rgba(199,70,52,.18) 0%, transparent 45%),
+                    radial-gradient(circle at 55% 80%, rgba(232,168,48,.12) 0%, transparent 40%);
+}
+.banner-content { position: relative; z-index: 1; text-align: center; padding: 24px; }
+.banner-icon { font-size: 52px; margin-bottom: 12px; display: block; }
+.banner-title {
+  font-size: 22px; font-weight: 700; color: #fff;
+  letter-spacing: -.3px; margin-bottom: 6px;
+}
+.banner-title em { font-style: normal; color: #E8A830; }
+.banner-sub { font-size: 12px; color: rgba(255,255,255,.6); }
+
+/* Quick stats bar */
+.quick-stats {
+  display: flex; gap: 0;
+  background: #fff; border: 1px solid var(--border);
+  border-radius: 4px; overflow: hidden; margin-bottom: 20px;
+}
+.qs-item {
+  flex: 1; padding: 12px 16px; text-align: center;
+  border-right: 1px solid var(--border);
+}
+.qs-item:last-child { border-right: none; }
+.qs-val {
+  font-size: 17px; font-weight: 700; color: var(--text-dark);
+  line-height: 1; margin-bottom: 4px;
+}
+.qs-label { font-size: 10.5px; color: var(--text-light); text-transform: uppercase; letter-spacing: .5px; }
+
+/* Section blocks */
+.section-block {
+  background: #fff; border: 1px solid var(--border);
+  border-radius: 4px; padding: 20px 22px; margin-bottom: 16px;
+}
+.section-block h2 {
+  font-size: 14px; font-weight: 700; color: var(--text-dark);
+  margin-bottom: 12px; padding-bottom: 10px;
+  border-bottom: 1px solid #eee;
+}
+.section-block p { font-size: 13px; color: var(--text-mid); line-height: 1.65; margin-bottom: 10px; }
+.section-block p:last-child { margin-bottom: 0; }
+
+/* Workshop list inside left col */
+.workshop-list { display: flex; flex-direction: column; gap: 10px; }
+.wl-item {
+  display: flex; gap: 12px; align-items: flex-start;
+  padding: 13px 14px; border: 1px solid var(--border);
+  border-radius: 4px; background: #FAFAFA; cursor: pointer;
+  transition: background .15s, border-color .15s;
+  text-decoration: none; color: inherit;
+}
+.wl-item:hover { background: #fff; border-color: #bbb; }
+.wl-num {
+  width: 26px; height: 26px; border-radius: 50%;
+  background: var(--workshop-card-bg); color: #fff;
+  font-size: 11px; font-weight: 700; display: flex;
+  align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px;
+}
+.wl-num.done { background: #3A8A5A; }
+.wl-body { flex: 1; }
+.wl-title { font-size: 12.5px; font-weight: 700; color: var(--text-dark); margin-bottom: 3px; line-height: 1.35; }
+.wl-desc  { font-size: 11.5px; color: var(--text-light); line-height: 1.5; }
+.wl-meta  { display: flex; gap: 10px; margin-top: 5px; }
+.wl-tag   { font-size: 10.5px; color: var(--text-light); display: flex; align-items: center; gap: 3px; }
+.wl-arrow {
+  color: #bbb; font-size: 16px; align-self: center;
+  flex-shrink: 0; transition: color .15s;
+}
+.wl-item:hover .wl-arrow { color: var(--oracle-red); }
+
+/* ── RIGHT COLUMN (sidebar) ── */
+.right-col { display: flex; flex-direction: column; gap: 14px; }
+
+.sidebar-box {
+  background: #fff; border: 1px solid var(--border);
+  border-radius: 4px; padding: 16px 18px;
+}
+.sidebar-box h3 {
+  font-size: 12.5px; font-weight: 700; color: var(--text-dark);
+  margin-bottom: 12px; padding-bottom: 8px;
+  border-bottom: 1px solid #eee; text-transform: uppercase;
+  letter-spacing: .4px;
+}
+
+/* Duration & meta */
+.meta-row { display: flex; align-items: center; gap: 7px; margin-bottom: 8px; font-size: 12.5px; color: var(--text-mid); }
+.meta-row:last-child { margin-bottom: 0; }
+.meta-icon { font-size: 14px; width: 18px; text-align: center; flex-shrink: 0; }
+.meta-label { color: var(--text-light); font-size: 11.5px; margin-right: 2px; }
+
+/* Outline (right sidebar) */
+.outline-list { list-style: none; padding: 0; }
+.outline-list li {
+  font-size: 12px; color: var(--text-mid);
+  padding: 5px 0; border-bottom: 1px solid #f0f0f0;
+  display: flex; align-items: flex-start; gap: 7px; line-height: 1.4;
+}
+.outline-list li:last-child { border-bottom: none; }
+.outline-num {
+  font-size: 10px; font-weight: 700; color: #fff;
+  background: #9AACB8; border-radius: 50%;
+  width: 16px; height: 16px; display: flex;
+  align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px;
+}
+
+/* Prerequisites */
+.prereq-list { list-style: none; }
+.prereq-list li {
+  font-size: 12px; color: var(--text-mid);
+  padding: 4px 0 4px 16px; position: relative; line-height: 1.45;
+}
+.prereq-list li::before {
+  content: '•'; position: absolute; left: 3px; color: var(--text-light);
+}
+
+/* Difficulty badge */
+.diff-badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 4px 10px; border-radius: 3px; font-size: 11.5px; font-weight: 700;
+}
+.diff-intermediate { background: #FFF3E0; color: #E65100; border: 1px solid #FFD180; }
+.diff-beginner     { background: #E8F5E9; color: #2E7D32; border: 1px solid #A5D6A7; }
+.diff-advanced     { background: #FCE4EC; color: #880E4F; border: 1px solid #F48FB1; }
+
+/* Progress bar */
+.progress-wrap { margin-top: 4px; }
+.progress-label { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-light); margin-bottom: 5px; }
+.progress-bar { height: 6px; background: #E8E8E8; border-radius: 3px; overflow: hidden; }
+.progress-fill { height: 100%; background: #3A8A5A; border-radius: 3px; width: 12%; }
+
+/* CTA in sidebar */
+.sidebar-cta {
+  background: var(--oracle-red); color: #fff; border: none;
+  width: 100%; padding: 10px; border-radius: 4px;
+  font-size: 13px; font-weight: 700; cursor: pointer;
+  font-family: inherit; transition: background .2s; margin-top: 2px;
+  text-decoration: none; display: block; text-align: center;
+}
+.sidebar-cta:hover { background: var(--oracle-red-hover); }
+.sidebar-cta-outline {
+  background: #fff; color: var(--text-dark); border: 1px solid #ccc;
+  width: 100%; padding: 8px; border-radius: 4px;
+  font-size: 12.5px; font-weight: 600; cursor: pointer;
+  font-family: inherit; transition: border-color .2s; margin-top: 6px;
+}
+.sidebar-cta-outline:hover { border-color: #999; }
+
+/* ── RELATED JOURNEYS ── */
+.related-section { margin-top: 28px; }
+.related-section h2 {
+  font-size: 15px; font-weight: 700; color: var(--text-dark);
+  margin-bottom: 6px;
+}
+.rule-gold { width: 36px; height: 3px; background: var(--rule-gold); border-radius: 2px; margin-bottom: 16px; }
+
+.related-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; }
+@media(max-width:720px){ .related-grid { grid-template-columns: repeat(2,1fr); } }
+
+.rcard {
+  background: var(--workshop-card-bg); border-radius: 5px;
+  padding: 14px 12px; cursor: pointer;
+  transition: transform .2s, box-shadow .2s;
+}
+.rcard:hover { transform: translateY(-2px); box-shadow: 0 5px 18px rgba(0,0,0,.18); }
+.rcard-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 8px; }
+.rcard-title { font-size: 11.5px; font-weight: 700; color: #fff; line-height: 1.4; flex: 1; margin-right: 6px; }
+.rcard-ico { width: 24px; height: 24px; border-radius: 3px; display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0; }
+.ri-t { background: rgba(90,171,170,.3); }
+.ri-g { background: rgba(232,168,48,.3); }
+.ri-r { background: rgba(199,70,52,.3); }
+.ri-b { background: rgba(60,130,200,.3); }
+.rcard p { font-size: 11px; color: rgba(255,255,255,.45); line-height: 1.5; margin-bottom: 10px; }
+.rcard-meta { display: flex; gap: 8px; font-size: 10.5px; color: rgba(255,255,255,.35); }
+
+/* ── FOOTER ── */
+footer { background: var(--footer-bg); border-top: 1px solid #ddd; padding: 36px 32px 16px; margin-top: 40px; }
+.fgrid { display: flex; gap: 28px; flex-wrap: wrap; max-width: 960px; margin: 0 auto 24px; justify-content: space-between; }
+.fcol h4 { font-size: 11.5px; font-weight: 700; color: var(--text-dark); margin-bottom: 10px; text-transform: uppercase; letter-spacing: .5px; }
+.fcol a { display: block; font-size: 12px; color: var(--footer-link); text-decoration: none; margin-bottom: 6px; }
+.fcol a:hover { text-decoration: underline; }
+.fbot { border-top: 1px solid #ccc; padding-top: 12px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; max-width: 960px; margin: 0 auto; font-size: 11px; color: #888; }
+.fbot a { color: #888; text-decoration: none; margin-left: 12px; }
+.fbot .apex { color: var(--footer-link) !important; }
+
+/* Floating help button */
+.help-btn {
+  position: fixed; bottom: 20px; right: 20px;
+  width: 44px; height: 44px; border-radius: 50%;
+  background: var(--oracle-red); color: #fff; border: none;
+  font-size: 18px; cursor: pointer; box-shadow: 0 3px 12px rgba(0,0,0,.25);
+  display: flex; align-items: center; justify-content: center;
+  transition: background .2s;
+}
+.help-btn:hover { background: var(--oracle-red-hover); }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<header class="top-bar">
+  <a href="index.html" class="top-bar-logo">
+    <span class="logo-livelabs-nav">Live<span>Labs</span></span>
+  </a>
+  <div class="nav-search">
+    <input type="text" placeholder="Search for workshops and sprints…">
+  </div>
+  <div class="nav-right">
+    <a href="#">Event Code</a>
+    <div class="user-menu-wrap">
+      <button class="user-btn" onclick="toggleUserMenu()">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="5" r="3" stroke="rgba(255,255,255,0.85)" stroke-width="1.4"/><path d="M2 14c0-3.314 2.686-5 6-5s6 1.686 6 5" stroke="rgba(255,255,255,0.85)" stroke-width="1.4" stroke-linecap="round"/></svg>
+        b&#114;ianna&#46;a&#46;ambler&#64;oracle&#46;com
+        <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 3.5L5 6.5L8 3.5" stroke="rgba(255,255,255,0.7)" stroke-width="1.4" stroke-linecap="round"/></svg>
+      </button>
+      <div class="user-dropdown" id="userDropdown">
+        <a href="#"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="2" y="2" width="10" height="10" rx="1.5" stroke="#555" stroke-width="1.3"/><path d="M4.5 7h5M7 4.5v5" stroke="#555" stroke-width="1.3" stroke-linecap="round"/></svg> My Reservations</a>
+        <a href="my-journeys.html"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7h10M7 2l5 5-5 5" stroke="#555" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg> My Journeys</a>
+        <a href="#"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5" stroke="#555" stroke-width="1.3"/><path d="M5.5 5.5a1.5 1.5 0 013 .5c0 1-1.5 1.5-1.5 2.5M7 10.5v.1" stroke="#555" stroke-width="1.3" stroke-linecap="round"/></svg> FAQ</a>
+        <a href="#"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 4h10v6a1 1 0 01-1 1H3a1 1 0 01-1-1V4z" stroke="#555" stroke-width="1.3"/><path d="M2 4l5 4 5-4" stroke="#555" stroke-width="1.3" stroke-linecap="round"/></svg> Feedback</a>
+        <a href="#"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="2" y="2" width="4" height="4" rx="1" stroke="#555" stroke-width="1.3"/><rect x="8" y="2" width="4" height="4" rx="1" stroke="#555" stroke-width="1.3"/><rect x="2" y="8" width="4" height="4" rx="1" stroke="#555" stroke-width="1.3"/><rect x="8" y="8" width="4" height="4" rx="1" stroke="#555" stroke-width="1.3"/></svg> Dashboard</a>
+        <div class="udrop-divider"></div>
+        <a href="#"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9 2h3v10H9M6 10l4-3-4-3M2 7h7" stroke="#555" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg> Sign Out</a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- BREADCRUMB -->
+<div class="breadcrumb">
+  <a href="#">LiveLabs</a>
+  <span>›</span>
+  <a href="#">Journeys</a>
+  <span>›</span>
+  Generative AI Developer
+</div>
+
+<!-- MAIN -->
+<div class="page-wrap">
+
+  <!-- Title row -->
+  <div class="title-row">
+    <div>
+      <div class="journey-badge">🗺 Journey</div>
+      <h1>Generative AI Developer</h1>
+    </div>
+    <div class="title-actions">
+      <div class="share-wrap">
+        <button class="btn-share" onclick="toggleShare(event,'hero-share')">
+          <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><circle cx="11" cy="3" r="1.5" stroke="currentColor" stroke-width="1.2"/><circle cx="11" cy="11" r="1.5" stroke="currentColor" stroke-width="1.2"/><circle cx="3" cy="7" r="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M4.4 6.2l5.2-2.8M4.4 7.8l5.2 2.8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+          Share
+        </button>
+        <div class="share-popover" id="hero-share">
+          <button class="share-option" onclick="copyLink(event,'hero-share','hero-confirm')">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="4" y="4" width="8" height="8" rx="1.2" stroke="#555" stroke-width="1.3"/><path d="M2 10V3a1 1 0 011-1h7" stroke="#555" stroke-width="1.3" stroke-linecap="round"/></svg>
+            Copy Link<span class="copy-confirm" id="hero-confirm">Copied!</span>
+          </button>
+        </div>
+      </div>
+      <a href="livelabs-workshop-page.html" class="btn-start">▶ Start Journey</a>
+    </div>
+  </div>
+
+  <!-- Two-column layout -->
+  <div class="content-grid">
+
+    <!-- LEFT -->
+    <div class="left-col">
+
+      <!-- Banner visual -->
+      <div class="journey-banner">
+        <div class="banner-pattern"></div>
+        <div class="banner-content">
+          <span class="banner-icon">🤖</span>
+          <div class="banner-title">Generative <em>AI</em> Developer Path</div>
+          <div class="banner-sub">Oracle Cloud Infrastructure · AI Services · Vector Database</div>
+        </div>
+      </div>
+
+      <!-- Quick stats -->
+      <div class="quick-stats">
+        <div class="qs-item">
+          <div class="qs-val">8</div>
+          <div class="qs-label">Workshops</div>
+        </div>
+        <div class="qs-item">
+          <div class="qs-val">~16 hrs</div>
+          <div class="qs-label">Total Time</div>
+        </div>
+        <div class="qs-item">
+          <div class="qs-val">Intermediate</div>
+          <div class="qs-label">Level</div>
+        </div>
+        <div class="qs-item">
+          <div class="qs-val">4,820</div>
+          <div class="qs-label">Enrolled</div>
+        </div>
+      </div>
+
+      <!-- About -->
+      <div class="section-block">
+        <h2>About This Journey</h2>
+        <p>This Journey takes you from the fundamentals of large language models all the way to building and deploying production-grade Generative AI applications using Oracle Cloud Infrastructure. You will work hands-on with OCI Generative AI Service, Oracle AI Vector Search, and Oracle Database 23ai to build Retrieval-Augmented Generation (RAG) pipelines and autonomous AI agents.</p>
+        <p>Each workshop in this path builds on the previous one, so you will finish with a complete, deployable AI application and a solid understanding of the underlying architecture. Whether you are an experienced developer new to AI or a data scientist looking to expand into cloud-native GenAI development, this Journey has been designed to meet you where you are and take you further.</p>
+      </div>
+
+      <!-- What you'll learn -->
+      <div class="section-block">
+        <h2>What You'll Learn</h2>
+        <ul style="list-style:none;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:7px 16px;">
+          <li style="font-size:12.5px;color:#444;display:flex;align-items:flex-start;gap:6px;"><span style="color:#3A8A5A;font-weight:700;flex-shrink:0;">✓</span>LLM fundamentals and prompt engineering</li>
+          <li style="font-size:12.5px;color:#444;display:flex;align-items:flex-start;gap:6px;"><span style="color:#3A8A5A;font-weight:700;flex-shrink:0;">✓</span>OCI Generative AI Service APIs</li>
+          <li style="font-size:12.5px;color:#444;display:flex;align-items:flex-start;gap:6px;"><span style="color:#3A8A5A;font-weight:700;flex-shrink:0;">✓</span>Vector embeddings and semantic search</li>
+          <li style="font-size:12.5px;color:#444;display:flex;align-items:flex-start;gap:6px;"><span style="color:#3A8A5A;font-weight:700;flex-shrink:0;">✓</span>Building RAG pipelines with Oracle DB</li>
+          <li style="font-size:12.5px;color:#444;display:flex;align-items:flex-start;gap:6px;"><span style="color:#3A8A5A;font-weight:700;flex-shrink:0;">✓</span>AI Agents and tool-calling patterns</li>
+          <li style="font-size:12.5px;color:#444;display:flex;align-items:flex-start;gap:6px;"><span style="color:#3A8A5A;font-weight:700;flex-shrink:0;">✓</span>Deploying GenAI apps on OCI</li>
+          <li style="font-size:12.5px;color:#444;display:flex;align-items:flex-start;gap:6px;"><span style="color:#3A8A5A;font-weight:700;flex-shrink:0;">✓</span>Monitoring and evaluating AI outputs</li>
+          <li style="font-size:12.5px;color:#444;display:flex;align-items:flex-start;gap:6px;"><span style="color:#3A8A5A;font-weight:700;flex-shrink:0;">✓</span>Cost optimization for AI workloads</li>
+        </ul>
+      </div>
+
+      <!-- Workshops in this Journey -->
+      <div class="section-block">
+        <h2>Workshops in This Journey</h2>
+        <div class="workshop-list">
+
+          <a href="livelabs-workshop-page.html" class="wl-item">
+            <div class="wl-num done">✓</div>
+            <div class="wl-body">
+              <div class="wl-title">LiveLabs LiveStack - Working with AI Agents that remember using Oracle AI Database</div>
+              <div class="wl-desc">LiveLabs LiveStacks are real-working demos! The Big Star Memory Agent demo shows how support AI evolves from chatbot replies to trusted, governed operations. Across 11 scenes, you see planning, memory, grounded policy decisions, approvals, and architecture in action. All powered by Oracle AI Database 26ai.</div>
+              <div class="wl-meta">
+                <span class="wl-tag">⏱ 1 hr</span>
+                <span class="wl-tag">🟢 Beginner</span>
+                <span class="wl-tag">👁 2,310 Views</span>
+              </div>
+            </div>
+            <div class="wl-arrow">›</div>
+          </a>
+
+          <a href="livelabs-workshop-page.html" class="wl-item">
+            <div class="wl-num">2</div>
+            <div class="wl-body">
+              <div class="wl-title">2. Prompt Engineering Fundamentals</div>
+              <div class="wl-desc">Master zero-shot, few-shot, and chain-of-thought prompting techniques to control model behavior and improve output quality.</div>
+              <div class="wl-meta">
+                <span class="wl-tag">⏱ 1.5 hrs</span>
+                <span class="wl-tag">🟢 Beginner</span>
+                <span class="wl-tag">👁 1,874 Views</span>
+              </div>
+            </div>
+            <div class="wl-arrow">›</div>
+          </a>
+
+          <a href="livelabs-workshop-page.html" class="wl-item">
+            <div class="wl-num">3</div>
+            <div class="wl-body">
+              <div class="wl-title">3. Vector Embeddings with Oracle AI Vector Search</div>
+              <div class="wl-desc">Understand embedding models, store and query vector data in Oracle Database 23ai, and perform similarity search at scale.</div>
+              <div class="wl-meta">
+                <span class="wl-tag">⏱ 2 hrs</span>
+                <span class="wl-tag">🟡 Intermediate</span>
+                <span class="wl-tag">👁 1,542 Views</span>
+              </div>
+            </div>
+            <div class="wl-arrow">›</div>
+          </a>
+
+          <a href="livelabs-workshop-page.html" class="wl-item">
+            <div class="wl-num">4</div>
+            <div class="wl-body">
+              <div class="wl-title">4. Build a RAG Pipeline with OCI and Oracle DB</div>
+              <div class="wl-desc">Combine vector search with a generative model to build a full Retrieval-Augmented Generation pipeline that answers questions from your own documents.</div>
+              <div class="wl-meta">
+                <span class="wl-tag">⏱ 2.5 hrs</span>
+                <span class="wl-tag">🟡 Intermediate</span>
+                <span class="wl-tag">👁 1,988 Views</span>
+              </div>
+            </div>
+            <div class="wl-arrow">›</div>
+          </a>
+
+          <a href="livelabs-workshop-page.html" class="wl-item">
+            <div class="wl-num">5</div>
+            <div class="wl-body">
+              <div class="wl-title">5. Integrating LangChain with OCI Generative AI</div>
+              <div class="wl-desc">Use the popular LangChain framework with OCI's LLM providers to rapidly build chains, tools, and memory-enabled conversational apps.</div>
+              <div class="wl-meta">
+                <span class="wl-tag">⏱ 2 hrs</span>
+                <span class="wl-tag">🟡 Intermediate</span>
+                <span class="wl-tag">👁 1,205 Views</span>
+              </div>
+            </div>
+            <div class="wl-arrow">›</div>
+          </a>
+
+          <a href="livelabs-workshop-page.html" class="wl-item">
+            <div class="wl-num">6</div>
+            <div class="wl-body">
+              <div class="wl-title">6. From RAG to Agents — Agentic AI Patterns</div>
+              <div class="wl-desc">Extend your RAG app into an autonomous agent that can call tools, browse data sources, write code, and self-correct its outputs.</div>
+              <div class="wl-meta">
+                <span class="wl-tag">⏱ 2.5 hrs</span>
+                <span class="wl-tag">🔴 Advanced</span>
+                <span class="wl-tag">👁 1,640 Views</span>
+              </div>
+            </div>
+            <div class="wl-arrow">›</div>
+          </a>
+
+          <a href="livelabs-workshop-page.html" class="wl-item">
+            <div class="wl-num">7</div>
+            <div class="wl-body">
+              <div class="wl-title">7. Fine-tuning and Custom Model Hosting on OCI</div>
+              <div class="wl-desc">Adapt a foundation model to your domain using OCI's dedicated AI cluster, then serve it via a scalable REST endpoint.</div>
+              <div class="wl-meta">
+                <span class="wl-tag">⏱ 2 hrs</span>
+                <span class="wl-tag">🔴 Advanced</span>
+                <span class="wl-tag">👁 980 Views</span>
+              </div>
+            </div>
+            <div class="wl-arrow">›</div>
+          </a>
+
+          <a href="livelabs-workshop-page-last.html" class="wl-item">
+            <div class="wl-num">8</div>
+            <div class="wl-body">
+              <div class="wl-title">8. Production Deployment, Monitoring & Cost Optimization</div>
+              <div class="wl-desc">Deploy your complete GenAI application to OCI, set up observability dashboards, and implement guardrails to keep AI outputs safe and on-budget.</div>
+              <div class="wl-meta">
+                <span class="wl-tag">⏱ 2 hrs</span>
+                <span class="wl-tag">🔴 Advanced</span>
+                <span class="wl-tag">👁 710 Views</span>
+              </div>
+            </div>
+            <div class="wl-arrow">›</div>
+          </a>
+
+        </div>
+      </div>
+
+    </div><!-- /left-col -->
+
+    <!-- RIGHT SIDEBAR -->
+    <div class="right-col">
+
+      <!-- Duration & details -->
+      <div class="sidebar-box">
+        <div class="meta-row"><span class="meta-icon">⏱</span><span><span class="meta-label">Total time:</span> ~16 hours</span></div>
+        <div class="meta-row"><span class="meta-icon">📚</span><span><span class="meta-label">Workshops:</span> 8</span></div>
+        <div class="meta-row"><span class="meta-icon">🎓</span>
+          <span><span class="meta-label">Level:</span>&nbsp;<span class="diff-badge diff-intermediate">⚡ Intermediate</span></span>
+        </div>
+        <div class="meta-row"><span class="meta-icon">☁️</span><span><span class="meta-label">Environment:</span> LiveLabs Sandbox</span></div>
+        <div class="meta-row"><span class="meta-icon">🌐</span><span><span class="meta-label">Language:</span> English</span></div>
+        <div style="height:10px;"></div>
+        <!-- Progress -->
+        <div class="progress-wrap">
+          <div class="progress-label"><span>Your Progress</span><span style="color:#3A8A5A;font-weight:700;">1 / 8 complete</span></div>
+          <div class="progress-bar"><div class="progress-fill"></div></div>
+        </div>
+        <div style="height:12px;"></div>
+        <a href="livelabs-workshop-page.html" class="sidebar-cta">▶ Continue Journey</a>
+        <div class="share-wrap" style="width:100%;">
+          <button class="sidebar-cta-outline" style="width:100%;" onclick="toggleShare(event,'sidebar-share')">
+            <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><circle cx="11" cy="3" r="1.5" stroke="currentColor" stroke-width="1.2"/><circle cx="11" cy="11" r="1.5" stroke="currentColor" stroke-width="1.2"/><circle cx="3" cy="7" r="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M4.4 6.2l5.2-2.8M4.4 7.8l5.2 2.8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+            Share
+          </button>
+          <div class="share-popover" id="sidebar-share" style="left:0;right:auto;">
+            <button class="share-option" onclick="copyLink(event,'sidebar-share','sidebar-confirm')">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="4" y="4" width="8" height="8" rx="1.2" stroke="#555" stroke-width="1.3"/><path d="M2 10V3a1 1 0 011-1h7" stroke="#555" stroke-width="1.3" stroke-linecap="round"/></svg>
+              Copy Link<span class="copy-confirm" id="sidebar-confirm">Copied!</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Outline -->
+      <div class="sidebar-box">
+        <h3>Outline</h3>
+        <ul class="outline-list">
+          <li><span class="outline-num">1</span>LiveLabs LiveStack</li>
+          <li><span class="outline-num">2</span>Prompt Engineering Fundamentals</li>
+          <li><span class="outline-num">3</span>Vector Embeddings &amp; AI Vector Search</li>
+          <li><span class="outline-num">4</span>Build a RAG Pipeline</li>
+          <li><span class="outline-num">5</span>LangChain with OCI GenAI</li>
+          <li><span class="outline-num">6</span>From RAG to Agents</li>
+          <li><span class="outline-num">7</span>Fine-tuning &amp; Custom Model Hosting</li>
+          <li><span class="outline-num">8</span>Production Deployment &amp; Monitoring</li>
+        </ul>
+      </div>
+
+      <!-- Prerequisites -->
+      <div class="sidebar-box">
+        <h3>Prerequisites</h3>
+        <p style="font-size:12px;color:#888;margin-bottom:8px;font-style:italic;">This Journey is currently only available on the LiveLabs Sandbox.</p>
+        <ul class="prereq-list">
+          <li>Basic Python programming experience</li>
+          <li>Familiarity with REST APIs</li>
+          <li>An OCI tenancy (free tier is sufficient)</li>
+          <li>No prior AI/ML experience required</li>
+        </ul>
+      </div>
+
+    </div><!-- /right-col -->
+
+  </div><!-- /content-grid -->
+
+  <!-- Related Journeys -->
+  <div class="related-section">
+    <h2>Other Journeys You Might Like</h2>
+    <div class="rule-gold"></div>
+    <div class="related-grid">
+
+      <div class="rcard">
+        <div class="rcard-top">
+          <div class="rcard-title">Oracle Database Fundamentals</div>
+          <div class="rcard-ico ri-g">🗄️</div>
+        </div>
+        <p>Master Oracle Database from SQL basics to performance tuning and high availability.</p>
+        <div class="rcard-meta"><span>⏱ ~12 hrs</span><span>6 workshops</span></div>
+      </div>
+
+      <div class="rcard">
+        <div class="rcard-top">
+          <div class="rcard-title">OCI Cloud Architecture</div>
+          <div class="rcard-ico ri-r">☁️</div>
+        </div>
+        <p>Design and deploy scalable, secure infrastructure using OCI best practices.</p>
+        <div class="rcard-meta"><span>⏱ ~20 hrs</span><span>10 workshops</span></div>
+      </div>
+
+      <div class="rcard">
+        <div class="rcard-top">
+          <div class="rcard-title">Data Science &amp; Analytics</div>
+          <div class="rcard-ico ri-t">📊</div>
+        </div>
+        <p>Explore OCI Data Science, AutoML, and Oracle Analytics Cloud.</p>
+        <div class="rcard-meta"><span>⏱ ~10 hrs</span><span>5 workshops</span></div>
+      </div>
+
+      <div class="rcard">
+        <div class="rcard-top">
+          <div class="rcard-title">DevOps &amp; Cloud Native</div>
+          <div class="rcard-ico ri-b">⚙️</div>
+        </div>
+        <p>Build CI/CD pipelines and deploy microservices on OCI Kubernetes Engine.</p>
+        <div class="rcard-meta"><span>⏱ ~18 hrs</span><span>9 workshops</span></div>
+      </div>
+
+    </div>
+  </div>
+
+</div><!-- /page-wrap -->
+
+<!-- FOOTER -->
+<footer>
+  <div class="fgrid">
+    <div class="fcol">
+      <h4>Resources</h4>
+      <a href="#">Developers</a><a href="#">Startups</a><a href="#">Students &amp; Educators</a>
+    </div>
+    <div class="fcol">
+      <h4>Partners</h4>
+      <a href="#">Oracle PartnerNetwork</a><a href="#">Find a Partner</a><a href="#">Log in to OPN</a>
+    </div>
+    <div class="fcol">
+      <h4>Solutions</h4>
+      <a href="#">Artificial Intelligence</a><a href="#">Internet of Things</a><a href="#">Blockchain</a>
+    </div>
+    <div class="fcol">
+      <h4>What's New</h4>
+      <a href="#">Oracle's response to COVID-19</a><a href="#">Java SE download</a><a href="#">Try Oracle Cloud Free Tier</a>
+    </div>
+    <div class="fcol">
+      <h4>Contact Us</h4>
+      <a href="#">US Sales: +1.800.633.0738</a><a href="#">How can we help?</a><a href="#">Subscribe to emails</a>
+    </div>
+  </div>
+  <div class="fbot">
+    <span>Release 2026.01.15 &nbsp;·&nbsp; Built with ♥ using <a href="#" class="apex">Oracle APEX</a></span>
+    <div>
+      <a href="#">© 2026 Oracle</a>
+      <a href="#">Terms of Use &amp; Privacy</a>
+      <a href="#">Cookie Preferences</a>
+      <a href="#">Ad Choices</a>
+    </div>
+  </div>
+</footer>
+
+<button class="help-btn" title="Help">?</button>
+
+<script>
+  function toggleUserMenu() {
+    document.getElementById('userDropdown').classList.toggle('open');
+  }
+  function toggleShare(e, id) {
+    e.stopPropagation();
+    const p = document.getElementById(id);
+    const isOpen = p.classList.contains('open');
+    document.querySelectorAll('.share-popover').forEach(x => x.classList.remove('open'));
+    if (!isOpen) p.classList.add('open');
+  }
+  function copyLink(e, popoverId, confirmId) {
+    e.stopPropagation();
+    const url = window.location.href;
+    navigator.clipboard.writeText(url).catch(() => {
+      const ta = document.createElement('textarea');
+      ta.value = url; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+    });
+    const el = document.getElementById(confirmId);
+    el.style.display = 'inline';
+    setTimeout(() => { el.style.display = 'none'; document.getElementById(popoverId).classList.remove('open'); }, 1500);
+  }
+  document.addEventListener('click', function(e) {
+    const userWrap = document.querySelector('.user-menu-wrap');
+    if (userWrap && !userWrap.contains(e.target)) document.getElementById('userDropdown').classList.remove('open');
+    document.querySelectorAll('.share-popover').forEach(x => x.classList.remove('open'));
+  });
+</script>
+</body>
+</html>

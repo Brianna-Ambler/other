@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Generative AI Developer Path — Oracle LiveLabs Journeys</title>
+<title>Generative AI Developer — Oracle LiveLabs Journeys</title>
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -58,6 +58,14 @@ body {
 .nav-right a { color: rgba(255,255,255,.8); text-decoration: none; font-size: 12.5px; font-weight: 600; }
 .nav-right a:hover { color: #fff; }
 .nav-right .signin { color: #fff; }
+.user-menu-wrap { position: relative; }
+.user-btn { background: none; border: none; cursor: pointer; color: rgba(255,255,255,0.85); font-size: 12px; font-family: inherit; display: flex; align-items: center; gap: 6px; padding: 4px 8px; border-radius: 3px; transition: background .15s; }
+.user-btn:hover { background: rgba(255,255,255,0.1); }
+.user-dropdown { display: none; position: absolute; top: calc(100% + 6px); right: 0; background: #fff; border: 1px solid #ddd; border-radius: 6px; box-shadow: 0 6px 24px rgba(0,0,0,0.14); min-width: 200px; z-index: 200; overflow: hidden; }
+.user-dropdown.open { display: block; }
+.user-dropdown a { display: flex; align-items: center; gap: 9px; padding: 10px 16px; font-size: 13px; color: #333; text-decoration: none; transition: background .15s; }
+.user-dropdown a:hover { background: #f5f5f5; }
+.udrop-divider { height: 1px; background: #eee; margin: 4px 0; }
 /* User dropdown */
 .user-menu-wrap { position: relative; }
 .user-btn { background: none; border: none; cursor: pointer; color: rgba(255,255,255,0.85); font-size: 12px; font-family: inherit; display: flex; align-items: center; gap: 6px; padding: 4px 8px; border-radius: 3px; transition: background .15s; }
@@ -110,6 +118,12 @@ body {
   transition: border-color .2s, color .2s;
 }
 .btn-share:hover { border-color: #999; color: #222; }
+.share-wrap { position: relative; display: inline-block; }
+.share-popover { display: none; position: absolute; top: calc(100% + 6px); right: 0; background: #fff; border: 1px solid #ddd; border-radius: 6px; box-shadow: 0 4px 16px rgba(0,0,0,0.12); min-width: 170px; z-index: 400; overflow: hidden; }
+.share-popover.open { display: block; }
+.share-option { display: flex; align-items: center; gap: 9px; padding: 10px 14px; font-size: 12.5px; color: #333; text-decoration: none; cursor: pointer; background: none; border: none; width: 100%; text-align: left; font-family: inherit; transition: background .15s; }
+.share-option:hover { background: #f5f5f5; }
+.copy-confirm { display: none; font-size: 11px; color: #2E7D32; margin-left: auto; }
 .share-wrap { position: relative; display: inline-block; }
 .share-popover { display: none; position: absolute; top: calc(100% + 6px); right: 0; background: #fff; border: 1px solid #ddd; border-radius: 6px; box-shadow: 0 4px 16px rgba(0,0,0,0.12); min-width: 170px; z-index: 400; overflow: hidden; }
 .share-popover.open { display: block; }
@@ -217,6 +231,20 @@ body {
   flex-shrink: 0; transition: color .15s;
 }
 .wl-item:hover .wl-arrow { color: var(--oracle-red); }
+/* ── CONTENT TYPE LABELS (Option B) ── */
+:root {
+  --col-workshop:   #1565C0;
+  --col-sprint:     #6A1F8A;
+  --col-livestack:  #BF5A00;
+}
+.wl-item { border-left-width: 3px; border-left-style: solid; border-left-color: transparent; }
+.wl-item.type-workshop  { border-left-color: var(--col-workshop); }
+.wl-item.type-sprint    { border-left-color: var(--col-sprint); }
+.wl-item.type-livestack { border-left-color: var(--col-livestack); }
+.wl-subtitle { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 3px; }
+.wl-subtitle.type-workshop  { color: var(--col-workshop); }
+.wl-subtitle.type-sprint    { color: var(--col-sprint); }
+.wl-subtitle.type-livestack { color: var(--col-livestack); }
 
 /* ── RIGHT COLUMN (sidebar) ── */
 .right-col { display: flex; flex-direction: column; gap: 14px; }
@@ -348,7 +376,7 @@ footer { background: var(--footer-bg); border-top: 1px solid #ddd; padding: 36px
 
 <!-- NAV -->
 <header class="top-bar">
-  <a href="index.html" class="top-bar-logo">
+  <a href="livelabs-homepage.html" class="top-bar-logo">
     <span class="logo-livelabs-nav">Live<span>Labs</span></span>
   </a>
   <div class="nav-search">
@@ -364,7 +392,7 @@ footer { background: var(--footer-bg); border-top: 1px solid #ddd; padding: 36px
       </button>
       <div class="user-dropdown" id="userDropdown">
         <a href="#"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="2" y="2" width="10" height="10" rx="1.5" stroke="#555" stroke-width="1.3"/><path d="M4.5 7h5M7 4.5v5" stroke="#555" stroke-width="1.3" stroke-linecap="round"/></svg> My Reservations</a>
-        <a href="https://brianna-ambler.github.io/other/my-journeys.html"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7h10M7 2l5 5-5 5" stroke="#555" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg> My Journeys</a>
+        <a href="my-journeys.html"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7h10M7 2l5 5-5 5" stroke="#555" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg> My Journeys</a>
         <a href="#"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5" stroke="#555" stroke-width="1.3"/><path d="M5.5 5.5a1.5 1.5 0 013 .5c0 1-1.5 1.5-1.5 2.5M7 10.5v.1" stroke="#555" stroke-width="1.3" stroke-linecap="round"/></svg> FAQ</a>
         <a href="#"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 4h10v6a1 1 0 01-1 1H3a1 1 0 01-1-1V4z" stroke="#555" stroke-width="1.3"/><path d="M2 4l5 4 5-4" stroke="#555" stroke-width="1.3" stroke-linecap="round"/></svg> Feedback</a>
         <a href="#"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="2" y="2" width="4" height="4" rx="1" stroke="#555" stroke-width="1.3"/><rect x="8" y="2" width="4" height="4" rx="1" stroke="#555" stroke-width="1.3"/><rect x="2" y="8" width="4" height="4" rx="1" stroke="#555" stroke-width="1.3"/><rect x="8" y="8" width="4" height="4" rx="1" stroke="#555" stroke-width="1.3"/></svg> Dashboard</a>
@@ -381,7 +409,7 @@ footer { background: var(--footer-bg); border-top: 1px solid #ddd; padding: 36px
   <span>›</span>
   <a href="#">Journeys</a>
   <span>›</span>
-  Generative AI Developer Path
+  Generative AI Developer
 </div>
 
 <!-- MAIN -->
@@ -391,7 +419,7 @@ footer { background: var(--footer-bg); border-top: 1px solid #ddd; padding: 36px
   <div class="title-row">
     <div>
       <div class="journey-badge">🗺 Journey</div>
-      <h1>Generative AI Developer Path</h1>
+      <h1>Generative AI Developer</h1>
     </div>
     <div class="title-actions">
       <div class="share-wrap">
@@ -406,7 +434,7 @@ footer { background: var(--footer-bg); border-top: 1px solid #ddd; padding: 36px
           </button>
         </div>
       </div>
-      <a href="https://brianna-ambler.github.io/other/livelabs-workshop-page.html" class="btn-start">▶ Start Journey</a>
+      <a href="livelabs-workshop-page.html" class="btn-start">▶ Start Journey</a>
     </div>
   </div>
 
@@ -470,14 +498,15 @@ footer { background: var(--footer-bg); border-top: 1px solid #ddd; padding: 36px
 
       <!-- Workshops in this Journey -->
       <div class="section-block">
-        <h2>Workshops in This Journey</h2>
+        <h2>Content in This Journey</h2>
         <div class="workshop-list">
 
-          <a href="https://brianna-ambler.github.io/other/livelabs-workshop-page.html" class="wl-item">
+          <a href="livestack-instructions.html" class="wl-item type-livestack">
             <div class="wl-num done">✓</div>
             <div class="wl-body">
-              <div class="wl-title">1. Introduction to OCI Generative AI Service</div>
-              <div class="wl-desc">Get started with Oracle's managed LLM service. Learn to call foundation models, manage prompts, and understand token usage and pricing.</div>
+              <div class="wl-subtitle type-livestack">LiveStack</div>
+              <div class="wl-title">1. Use AI Agents That Remember with the Oracle AI Database</div>
+              <div class="wl-desc">This Big Star Memory Agent demo shows how support AI evolves from chatbot replies to trusted, governed operations. Across 11 scenes, you see planning, memory, grounded policy decisions, approvals, and architecture in action. All powered by Oracle AI Database 26ai.</div>
               <div class="wl-meta">
                 <span class="wl-tag">⏱ 1 hr</span>
                 <span class="wl-tag">🟢 Beginner</span>
@@ -487,9 +516,10 @@ footer { background: var(--footer-bg); border-top: 1px solid #ddd; padding: 36px
             <div class="wl-arrow">›</div>
           </a>
 
-          <a href="https://brianna-ambler.github.io/other/livelabs-workshop-page.html" class="wl-item">
+          <a href="livelabs-workshop-page.html" class="wl-item type-workshop">
             <div class="wl-num">2</div>
             <div class="wl-body">
+              <div class="wl-subtitle type-workshop">Workshop</div>
               <div class="wl-title">2. Prompt Engineering Fundamentals</div>
               <div class="wl-desc">Master zero-shot, few-shot, and chain-of-thought prompting techniques to control model behavior and improve output quality.</div>
               <div class="wl-meta">
@@ -501,9 +531,10 @@ footer { background: var(--footer-bg); border-top: 1px solid #ddd; padding: 36px
             <div class="wl-arrow">›</div>
           </a>
 
-          <a href="https://brianna-ambler.github.io/other/livelabs-workshop-page.html" class="wl-item">
+          <a href="livelabs-workshop-page.html" class="wl-item type-workshop">
             <div class="wl-num">3</div>
             <div class="wl-body">
+              <div class="wl-subtitle type-workshop">Workshop</div>
               <div class="wl-title">3. Vector Embeddings with Oracle AI Vector Search</div>
               <div class="wl-desc">Understand embedding models, store and query vector data in Oracle Database 23ai, and perform similarity search at scale.</div>
               <div class="wl-meta">
@@ -515,9 +546,10 @@ footer { background: var(--footer-bg); border-top: 1px solid #ddd; padding: 36px
             <div class="wl-arrow">›</div>
           </a>
 
-          <a href="https://brianna-ambler.github.io/other/livelabs-workshop-page.html" class="wl-item">
+          <a href="livelabs-workshop-page.html" class="wl-item type-workshop">
             <div class="wl-num">4</div>
             <div class="wl-body">
+              <div class="wl-subtitle type-workshop">Workshop</div>
               <div class="wl-title">4. Build a RAG Pipeline with OCI and Oracle DB</div>
               <div class="wl-desc">Combine vector search with a generative model to build a full Retrieval-Augmented Generation pipeline that answers questions from your own documents.</div>
               <div class="wl-meta">
@@ -529,9 +561,10 @@ footer { background: var(--footer-bg); border-top: 1px solid #ddd; padding: 36px
             <div class="wl-arrow">›</div>
           </a>
 
-          <a href="https://brianna-ambler.github.io/other/livelabs-workshop-page.html" class="wl-item">
+          <a href="livelabs-workshop-page.html" class="wl-item type-workshop">
             <div class="wl-num">5</div>
             <div class="wl-body">
+              <div class="wl-subtitle type-workshop">Workshop</div>
               <div class="wl-title">5. Integrating LangChain with OCI Generative AI</div>
               <div class="wl-desc">Use the popular LangChain framework with OCI's LLM providers to rapidly build chains, tools, and memory-enabled conversational apps.</div>
               <div class="wl-meta">
@@ -543,9 +576,10 @@ footer { background: var(--footer-bg); border-top: 1px solid #ddd; padding: 36px
             <div class="wl-arrow">›</div>
           </a>
 
-          <a href="https://brianna-ambler.github.io/other/livelabs-workshop-page.html" class="wl-item">
+          <a href="livelabs-workshop-page.html" class="wl-item type-workshop">
             <div class="wl-num">6</div>
             <div class="wl-body">
+              <div class="wl-subtitle type-workshop">Workshop</div>
               <div class="wl-title">6. From RAG to Agents — Agentic AI Patterns</div>
               <div class="wl-desc">Extend your RAG app into an autonomous agent that can call tools, browse data sources, write code, and self-correct its outputs.</div>
               <div class="wl-meta">
@@ -557,9 +591,10 @@ footer { background: var(--footer-bg); border-top: 1px solid #ddd; padding: 36px
             <div class="wl-arrow">›</div>
           </a>
 
-          <a href="https://brianna-ambler.github.io/other/livelabs-workshop-page.html" class="wl-item">
+          <a href="livelabs-workshop-page.html" class="wl-item type-workshop">
             <div class="wl-num">7</div>
             <div class="wl-body">
+              <div class="wl-subtitle type-workshop">Workshop</div>
               <div class="wl-title">7. Fine-tuning and Custom Model Hosting on OCI</div>
               <div class="wl-desc">Adapt a foundation model to your domain using OCI's dedicated AI cluster, then serve it via a scalable REST endpoint.</div>
               <div class="wl-meta">
@@ -571,9 +606,10 @@ footer { background: var(--footer-bg); border-top: 1px solid #ddd; padding: 36px
             <div class="wl-arrow">›</div>
           </a>
 
-          <a href="https://brianna-ambler.github.io/other/livelabs-workshop-page-last.html" class="wl-item">
+          <a href="livelabs-workshop-page-last.html" class="wl-item type-workshop">
             <div class="wl-num">8</div>
             <div class="wl-body">
+              <div class="wl-subtitle type-workshop">Workshop</div>
               <div class="wl-title">8. Production Deployment, Monitoring & Cost Optimization</div>
               <div class="wl-desc">Deploy your complete GenAI application to OCI, set up observability dashboards, and implement guardrails to keep AI outputs safe and on-budget.</div>
               <div class="wl-meta">
@@ -609,7 +645,7 @@ footer { background: var(--footer-bg); border-top: 1px solid #ddd; padding: 36px
           <div class="progress-bar"><div class="progress-fill"></div></div>
         </div>
         <div style="height:12px;"></div>
-        <a href="https://brianna-ambler.github.io/other/livelabs-workshop-page.html" class="sidebar-cta">▶ Continue Journey</a>
+        <a href="livelabs-workshop-page.html" class="sidebar-cta">▶ Continue Journey</a>
         <div class="share-wrap" style="width:100%;">
           <button class="sidebar-cta-outline" style="width:100%;" onclick="toggleShare(event,'sidebar-share')">
             <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><circle cx="11" cy="3" r="1.5" stroke="currentColor" stroke-width="1.2"/><circle cx="11" cy="11" r="1.5" stroke="currentColor" stroke-width="1.2"/><circle cx="3" cy="7" r="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M4.4 6.2l5.2-2.8M4.4 7.8l5.2 2.8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
@@ -739,6 +775,34 @@ footer { background: var(--footer-bg); border-top: 1px solid #ddd; padding: 36px
 
 <button class="help-btn" title="Help">?</button>
 
+<script>
+  function toggleUserMenu() {
+    document.getElementById('userDropdown').classList.toggle('open');
+  }
+  function toggleShare(e, id) {
+    e.stopPropagation();
+    const p = document.getElementById(id);
+    const isOpen = p.classList.contains('open');
+    document.querySelectorAll('.share-popover').forEach(x => x.classList.remove('open'));
+    if (!isOpen) p.classList.add('open');
+  }
+  function copyLink(e, popoverId, confirmId) {
+    e.stopPropagation();
+    const url = window.location.href;
+    navigator.clipboard.writeText(url).catch(() => {
+      const ta = document.createElement('textarea');
+      ta.value = url; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+    });
+    const el = document.getElementById(confirmId);
+    el.style.display = 'inline';
+    setTimeout(() => { el.style.display = 'none'; document.getElementById(popoverId).classList.remove('open'); }, 1500);
+  }
+  document.addEventListener('click', function(e) {
+    const userWrap = document.querySelector('.user-menu-wrap');
+    if (userWrap && !userWrap.contains(e.target)) document.getElementById('userDropdown').classList.remove('open');
+    document.querySelectorAll('.share-popover').forEach(x => x.classList.remove('open'));
+  });
+</script>
 <script>
   function toggleUserMenu() {
     document.getElementById('userDropdown').classList.toggle('open');

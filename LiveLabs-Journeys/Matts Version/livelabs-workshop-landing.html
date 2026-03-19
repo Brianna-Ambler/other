@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Migrate Using Data Pump — LiveLabs</title>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --oracle-red:    #C74634;
+  --oracle-red-h:  #A5392A;
+  --nav-bg:        #1A1A1A;
+  --journey-bg:    #192634;
+  --journey-gold:  #E8A830;
+  --border:        #E0E0E0;
+  --bg:            #F4F4F4;
+  --text-dark:     #1A1A1A;
+  --text-mid:      #555;
+  --text-light:    #888;
+  --done-green:    #2E7D32;
+  --inprogress:    #1565C0;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Open Sans', Arial, sans-serif; font-size: 13px; color: var(--text-dark); background: var(--bg); }
+
+/* ── TOP NAV ── */
+.top-nav { background: var(--nav-bg); height: 44px; display: flex; align-items: center; padding: 0 20px; gap: 12px; position: sticky; top: 0; z-index: 100; }
+.nav-logo { display: flex; align-items: center; gap: 6px; text-decoration: none; }
+.nav-logo-box { background: var(--oracle-red); color: #fff; padding: 2px 7px; border-radius: 2px; font-size: 12px; font-weight: 700; }
+.nav-search { flex: 1; background: #fff; border: none; border-radius: 3px; padding: 6px 12px; font-size: 12.5px; font-family: inherit; outline: none; color: #333; }
+.nav-search::placeholder { color: #aaa; }
+.nav-right { margin-left: auto; display: flex; align-items: center; gap: 14px; }
+.nav-link { color: rgba(255,255,255,0.82); text-decoration: none; font-size: 12px; display: flex; align-items: center; gap: 5px; }
+.nav-link:hover { color: #fff; }
+.user-menu-wrap { position: relative; }
+.user-btn { background: none; border: none; cursor: pointer; color: rgba(255,255,255,0.85); font-size: 12px; font-family: inherit; display: flex; align-items: center; gap: 6px; padding: 4px 8px; border-radius: 3px; transition: background .15s; }
+.user-btn:hover { background: rgba(255,255,255,0.1); }
+.user-dropdown { display: none; position: absolute; top: calc(100% + 6px); right: 0; background: #fff; border: 1px solid #ddd; border-radius: 6px; box-shadow: 0 6px 24px rgba(0,0,0,0.14); min-width: 200px; z-index: 200; overflow: hidden; }
+.user-dropdown.open { display: block; }
+.user-dropdown a { display: flex; align-items: center; gap: 9px; padding: 10px 16px; font-size: 13px; color: #333; text-decoration: none; transition: background .15s; }
+.user-dropdown a:hover { background: #f5f5f5; }
+.udrop-divider { height: 1px; background: #eee; margin: 4px 0; }
+
+/* ── JOURNEY STRIP ── */
+.journey-strip { background: var(--journey-bg); border-bottom: 2px solid var(--journey-gold); padding: 0 20px; display: flex; align-items: center; height: 44px; gap: 0; }
+.js-back { display: flex; align-items: center; gap: 6px; color: rgba(255,255,255,0.7); text-decoration: none; font-size: 12px; font-weight: 600; padding: 0 12px 0 0; border-right: 1px solid rgba(255,255,255,0.15); margin-right: 12px; white-space: nowrap; transition: color .2s; }
+.js-back:hover { color: #fff; }
+.js-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--journey-gold); margin-right: 8px; white-space: nowrap; }
+.js-name { font-size: 12.5px; font-weight: 600; color: rgba(255,255,255,0.9); margin-right: 16px; white-space: nowrap; }
+.js-divider { color: rgba(255,255,255,0.25); margin: 0 4px; }
+.js-progress { display: flex; align-items: center; gap: 10px; flex: 1; margin: 0 16px; }
+.js-track { flex: 1; height: 6px; max-width: 220px; background: rgba(255,255,255,0.15); border-radius: 4px; overflow: hidden; }
+.js-fill { height: 100%; background: linear-gradient(90deg, var(--oracle-red), #E07060); border-radius: 4px; }
+.js-counter { white-space: nowrap; font-size: 11px; color: rgba(255,255,255,0.55); }
+.js-counter strong { color: rgba(255,255,255,0.85); font-weight: 600; }
+
+/* ── PAGE BODY ── */
+.page-wrap { max-width: 980px; margin: 0 auto; padding: 24px 24px 60px; }
+
+/* ── TITLE ROW ── */
+.title-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 20px; }
+.title-row h1 { font-size: 22px; font-weight: 700; color: var(--text-dark); line-height: 1.3; flex: 1; }
+.title-actions { display: flex; gap: 8px; flex-shrink: 0; align-items: center; margin-top: 4px; }
+.btn-outline { display: inline-flex; align-items: center; gap: 6px; padding: 7px 16px; border: 1px solid #ccc; border-radius: 4px; font-size: 12.5px; font-weight: 600; color: var(--text-mid); background: #fff; cursor: pointer; font-family: inherit; text-decoration: none; transition: border-color .15s, background .15s; }
+.btn-outline:hover { border-color: #aaa; background: #f5f5f5; }
+.btn-start { display: inline-flex; align-items: center; gap: 6px; padding: 7px 20px; border: none; border-radius: 4px; font-size: 12.5px; font-weight: 700; color: #fff; background: var(--oracle-red); cursor: pointer; font-family: inherit; text-decoration: none; transition: background .15s; }
+.btn-start:hover { background: var(--oracle-red-h); }
+
+/* ── MAIN CONTENT + SIDEBAR LAYOUT ── */
+.content-layout { display: grid; grid-template-columns: 1fr 280px; gap: 20px; align-items: start; }
+
+/* ── VIDEO ── */
+.video-wrap { position: relative; background: #111; border-radius: 8px; overflow: hidden; aspect-ratio: 16/9; margin-bottom: 20px; cursor: pointer; }
+.video-wrap img { width: 100%; height: 100%; object-fit: cover; display: block; opacity: 0.8; }
+.video-placeholder { width: 100%; height: 100%; background: linear-gradient(135deg, #1a2a3a 0%, #0d1820 100%); display: flex; align-items: center; justify-content: center; }
+.video-play { width: 56px; height: 56px; background: rgba(255,255,255,0.15); border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid rgba(255,255,255,0.4); transition: background .2s; }
+.video-wrap:hover .video-play { background: rgba(255,255,255,0.25); }
+.video-play svg { margin-left: 4px; }
+
+/* ── ABOUT SECTION ── */
+.about-section { background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 20px; margin-bottom: 20px; }
+.about-section h2 { font-size: 15px; font-weight: 700; margin-bottom: 12px; color: var(--text-dark); }
+.about-section p { font-size: 13px; color: var(--text-mid); line-height: 1.7; }
+.meta-row { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-light); margin-bottom: 14px; }
+.meta-row svg { flex-shrink: 0; }
+
+/* ── RELATED WORKSHOPS ── */
+.related-section { background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 20px; }
+.related-section h2 { font-size: 15px; font-weight: 700; margin-bottom: 4px; color: var(--text-dark); }
+.related-rule { width: 36px; height: 3px; background: var(--journey-gold); border-radius: 2px; margin-bottom: 16px; }
+.related-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.rel-card { background: #fff; border: 1px solid var(--border); border-radius: 6px; overflow: hidden; text-decoration: none; color: inherit; transition: box-shadow .2s, transform .15s; display: flex; flex-direction: column; }
+.rel-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.1); transform: translateY(-2px); }
+.rel-card-icon { height: 52px; display: flex; align-items: center; justify-content: center; }
+.rci-teal  { background: rgba(90,171,170,.18); }
+.rci-blue  { background: rgba(60,130,200,.18); }
+.rci-red   { background: rgba(199,70,52,.18); }
+.rci-green { background: rgba(80,180,100,.18); }
+.rel-card-body { padding: 10px; flex: 1; display: flex; flex-direction: column; }
+.rel-card-title { font-size: 12px; font-weight: 700; color: var(--text-dark); margin-bottom: 6px; line-height: 1.35; flex: 1; }
+.rel-card-meta { font-size: 11px; color: var(--text-light); display: flex; align-items: center; gap: 10px; }
+
+/* ── SIDEBAR ── */
+.sidebar { display: flex; flex-direction: column; gap: 14px; }
+.sidebar-card { background: #fff; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+.sidebar-card-head { padding: 12px 14px 10px; border-bottom: 1px solid var(--border); }
+.sidebar-card-head h3 { font-size: 12.5px; font-weight: 700; color: var(--text-dark); }
+.sidebar-card-body { padding: 12px 14px; }
+.outline-list { list-style: none; }
+.outline-list li { display: flex; align-items: flex-start; gap: 8px; font-size: 12px; color: var(--text-mid); padding: 4px 0; line-height: 1.45; }
+.outline-check { flex-shrink: 0; margin-top: 1px; color: var(--oracle-red); }
+.prereq-list { list-style: none; }
+.prereq-list li { display: flex; align-items: flex-start; gap: 8px; font-size: 12px; color: var(--text-mid); padding: 4px 0; line-height: 1.45; }
+.prereq-dot { width: 5px; height: 5px; border-radius: 50%; background: #bbb; flex-shrink: 0; margin-top: 5px; }
+.sidebar-meta-row { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-mid); padding: 5px 0; border-bottom: 1px solid #f5f5f5; }
+.sidebar-meta-row:last-child { border-bottom: none; }
+.sidebar-meta-label { color: var(--text-light); font-size: 11px; min-width: 80px; }
+
+/* ── FOOTER ── */
+footer { background: #F0F0F0; border-top: 1px solid #ddd; padding: 28px 24px 14px; }
+.fgrid { display: flex; gap: 24px; flex-wrap: wrap; max-width: 980px; margin: 0 auto 20px; justify-content: space-between; }
+.fcol h4 { font-size: 11.5px; font-weight: 700; color: var(--text-dark); margin-bottom: 8px; text-transform: uppercase; letter-spacing: .5px; }
+.fcol a { display: block; font-size: 12px; color: var(--oracle-red); text-decoration: none; margin-bottom: 5px; }
+.fcol a:hover { text-decoration: underline; }
+.fbot { border-top: 1px solid #ccc; padding-top: 12px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; max-width: 980px; margin: 0 auto; font-size: 11px; color: #888; }
+.fbot a { color: #888; text-decoration: none; margin-left: 12px; }
+.fbot .apex { color: var(--oracle-red) !important; }
+</style>
+</head>
+<body>
+
+<!-- ── TOP NAV ── -->
+<header class="top-nav">
+  <a href="livelabs-homepage.html" class="nav-logo">
+    <span class="nav-logo-box">LiveLabs</span>
+  </a>
+  <input class="nav-search" type="text" placeholder="Search for workshops and sprints…">
+  <div class="nav-right">
+    <a href="#" class="nav-link">
+      <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><rect x="1.5" y="1.5" width="4" height="4" rx="0.8" stroke="currentColor" stroke-width="1.3"/><rect x="8.5" y="1.5" width="4" height="4" rx="0.8" stroke="currentColor" stroke-width="1.3"/><rect x="1.5" y="8.5" width="4" height="4" rx="0.8" stroke="currentColor" stroke-width="1.3"/><rect x="8.5" y="8.5" width="4" height="4" rx="0.8" stroke="currentColor" stroke-width="1.3"/></svg>
+      Event Code
+    </a>
+    <div class="user-menu-wrap">
+      <button class="user-btn" onclick="toggleUserMenu()">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="5" r="3" stroke="rgba(255,255,255,0.85)" stroke-width="1.4"/><path d="M2 14c0-3.314 2.686-5 6-5s6 1.686 6 5" stroke="rgba(255,255,255,0.85)" stroke-width="1.4" stroke-linecap="round"/></svg>
+        b&#114;ianna&#46;a&#46;ambler&#64;oracle&#46;com
+        <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 3.5L5 6.5L8 3.5" stroke="rgba(255,255,255,0.7)" stroke-width="1.4" stroke-linecap="round"/></svg>
+      </button>
+      <div class="user-dropdown" id="userDropdown">
+        <a href="#"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="2" y="2" width="10" height="10" rx="1.5" stroke="#555" stroke-width="1.3"/><path d="M4.5 7h5M7 4.5v5" stroke="#555" stroke-width="1.3" stroke-linecap="round"/></svg> My Reservations</a>
+        <a href="my-journeys.html"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7h10M7 2l5 5-5 5" stroke="#555" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg> My Journeys</a>
+        <a href="#"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5" stroke="#555" stroke-width="1.3"/><path d="M5.5 5.5a1.5 1.5 0 013 .5c0 1-1.5 1.5-1.5 2.5M7 10.5v.1" stroke="#555" stroke-width="1.3" stroke-linecap="round"/></svg> FAQ</a>
+        <a href="#"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 4h10v6a1 1 0 01-1 1H3a1 1 0 01-1-1V4z" stroke="#555" stroke-width="1.3"/><path d="M2 4l5 4 5-4" stroke="#555" stroke-width="1.3" stroke-linecap="round"/></svg> Feedback</a>
+        <a href="#"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="2" y="2" width="4" height="4" rx="1" stroke="#555" stroke-width="1.3"/><rect x="8" y="2" width="4" height="4" rx="1" stroke="#555" stroke-width="1.3"/><rect x="2" y="8" width="4" height="4" rx="1" stroke="#555" stroke-width="1.3"/><rect x="8" y="8" width="4" height="4" rx="1" stroke="#555" stroke-width="1.3"/></svg> Dashboard</a>
+        <div class="udrop-divider"></div>
+        <a href="#"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9 2h3v10H9M6 10l4-3-4-3M2 7h7" stroke="#555" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg> Sign Out</a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ── JOURNEY STRIP ── -->
+<div class="journey-strip">
+  <a href="journey-landing-page.html" class="js-back">
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9 11L5 7L9 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    Back to Journey
+  </a>
+  <span class="js-label">Journey</span>
+  <span class="js-name">Oracle Database Fundamentals</span>
+  <span class="js-divider">·</span>
+  <div class="js-progress">
+    <div class="js-track"><div class="js-fill" style="width:83.3%"></div></div>
+    <span class="js-counter"><strong>5 of 6</strong> complete</span>
+  </div>
+</div>
+
+<!-- ── PAGE BODY ── -->
+<div class="page-wrap">
+
+  <!-- Title + actions -->
+  <div class="title-row">
+    <h1>Migrate Using Data Pump and Full Transportable Export/Import</h1>
+    <div class="title-actions">
+      <button class="btn-outline">
+        <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><circle cx="11" cy="3" r="1.5" stroke="currentColor" stroke-width="1.2"/><circle cx="11" cy="11" r="1.5" stroke="currentColor" stroke-width="1.2"/><circle cx="3" cy="7" r="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M4.4 6.2l5.2-2.8M4.4 7.8l5.2 2.8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+        Share
+      </button>
+      <a href="livelabs-workshop-page-last.html" class="btn-start">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><polygon points="3,1 11,6 3,11" fill="#fff"/></svg>
+        Start
+      </a>
+    </div>
+  </div>
+
+  <!-- Two-column layout -->
+  <div class="content-layout">
+
+    <!-- LEFT: video + about + related -->
+    <div>
+
+      <!-- Video -->
+      <div class="video-wrap">
+        <div class="video-placeholder">
+          <div class="video-play">
+            <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><polygon points="7,4 19,11 7,18" fill="rgba(255,255,255,0.9)"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Time -->
+      <div class="meta-row" style="margin-bottom:16px;">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="#888" stroke-width="1.3"/><path d="M7 4v3.5l2 1.5" stroke="#888" stroke-width="1.3" stroke-linecap="round"/></svg>
+        6 hours
+      </div>
+
+      <!-- About -->
+      <div class="about-section">
+        <h2>About This Workshop</h2>
+        <p>Learn how to upgrade and migrate your database to the latest version of Oracle AI Database. In this workshop, you learn how to use AutoUpgrade to make upgrade and non-CDB to PDB migrations much easier. Further, you can use our Performance Stability Prescription to help you to avoid the biggest fear of a DBA: bad execution plans after the upgrade. Using tools like SQL Performance Analyzer and SQL Plan Management, you can ensure performance stability after any change — including upgrades and migrations. You will also try migrating a database to a PDB using various techniques. Finally, you learn how to restore after a failed upgrade and downgrade a PDB.</p>
+      </div>
+
+      <!-- Related workshops -->
+      <div class="related-section">
+        <h2>Other Workshops you might like</h2>
+        <div class="related-rule"></div>
+        <div class="related-grid">
+
+          <a href="#" class="rel-card">
+            <div class="rel-card-icon rci-teal">
+              <svg width="26" height="26" viewBox="0 0 26 26" fill="none"><ellipse cx="13" cy="7" rx="8" ry="3" stroke="#2E8080" stroke-width="1.5"/><path d="M5 7v12c0 1.66 3.58 3 8 3s8-1.34 8-3V7" stroke="#2E8080" stroke-width="1.5"/><path d="M5 13c0 1.66 3.58 3 8 3s8-1.34 8-3" stroke="#2E8080" stroke-width="1.5"/></svg>
+            </div>
+            <div class="rel-card-body">
+              <div class="rel-card-title">Patch Me If You Can - Oracle AI Database</div>
+              <div class="rel-card-meta">
+                <span>4 hrs</span>
+                <span>7,510 Views</span>
+              </div>
+            </div>
+          </a>
+
+          <a href="#" class="rel-card">
+            <div class="rel-card-icon rci-blue">
+              <svg width="26" height="26" viewBox="0 0 26 26" fill="none"><rect x="4" y="4" width="18" height="14" rx="2" stroke="#1565C0" stroke-width="1.5"/><path d="M9 22h8M13 18v4" stroke="#1565C0" stroke-width="1.5" stroke-linecap="round"/></svg>
+            </div>
+            <div class="rel-card-body">
+              <div class="rel-card-title">Next-Level Platform Migration with Cross-Platform Transportable Tablespaces</div>
+              <div class="rel-card-meta">
+                <span>4 hrs</span>
+                <span>1,544 Views</span>
+              </div>
+            </div>
+          </a>
+
+          <a href="#" class="rel-card">
+            <div class="rel-card-icon rci-red">
+              <svg width="26" height="26" viewBox="0 0 26 26" fill="none"><circle cx="13" cy="13" r="8" stroke="#A03020" stroke-width="1.5"/><path d="M13 9v4.5l3 2" stroke="#A03020" stroke-width="1.5" stroke-linecap="round"/></svg>
+            </div>
+            <div class="rel-card-body">
+              <div class="rel-card-title">EM - Automated Database Patching at Scale with Fleet Maintenance</div>
+              <div class="rel-card-meta">
+                <span>1 hr</span>
+                <span>2,819 Views</span>
+              </div>
+            </div>
+          </a>
+
+          <a href="#" class="rel-card">
+            <div class="rel-card-icon rci-green">
+              <svg width="26" height="26" viewBox="0 0 26 26" fill="none"><path d="M7 13l4 4 8-8" stroke="#2E7D32" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="13" cy="13" r="9" stroke="#2E7D32" stroke-width="1.5"/></svg>
+            </div>
+            <div class="rel-card-body">
+              <div class="rel-card-title">Autonomous Database Migration Bootcamp</div>
+              <div class="rel-card-meta">
+                <span>2 hrs</span>
+                <span>652 Views</span>
+              </div>
+            </div>
+          </a>
+
+        </div>
+      </div>
+
+    </div><!-- /left -->
+
+    <!-- RIGHT: sidebar -->
+    <div class="sidebar">
+
+      <!-- Details -->
+      <div class="sidebar-card">
+        <div class="sidebar-card-head"><h3>Details</h3></div>
+        <div class="sidebar-card-body">
+          <div class="sidebar-meta-row">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="#888" stroke-width="1.3"/><path d="M7 4v3.5l2 1.5" stroke="#888" stroke-width="1.3" stroke-linecap="round"/></svg>
+            <span class="sidebar-meta-label">Duration</span>
+            <strong>6 hours</strong>
+          </div>
+          <div class="sidebar-meta-row">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 11l3-3 2 2 5-5" stroke="#888" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span class="sidebar-meta-label">Level</span>
+            <strong>Intermediate</strong>
+          </div>
+          <div class="sidebar-meta-row">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="2" y="3" width="10" height="9" rx="1.5" stroke="#888" stroke-width="1.3"/><path d="M2 6h10M5 3V1M9 3V1" stroke="#888" stroke-width="1.3" stroke-linecap="round"/></svg>
+            <span class="sidebar-meta-label">Updated</span>
+            <strong>Feb 2026</strong>
+          </div>
+          <div class="sidebar-meta-row">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1.5a5.5 5.5 0 100 11 5.5 5.5 0 000-11zM4 7h6" stroke="#888" stroke-width="1.3" stroke-linecap="round"/></svg>
+            <span class="sidebar-meta-label">Environment</span>
+            <strong>LiveLabs Sandbox</strong>
+          </div>
+        </div>
+      </div>
+
+      <!-- Outline -->
+      <div class="sidebar-card">
+        <div class="sidebar-card-head"><h3>Outline</h3></div>
+        <div class="sidebar-card-body">
+          <ul class="outline-list">
+            <li>
+              <svg class="outline-check" width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 7l3 3 6-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Upgrade Oracle AI Database using AutoUpgrade
+            </li>
+            <li>
+              <svg class="outline-check" width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 7l3 3 6-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Convert to multitenant architecture using AutoUpgrade
+            </li>
+            <li>
+              <svg class="outline-check" width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 7l3 3 6-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Convert to multitenant architecture using Refreshable Clone PDBs
+            </li>
+            <li>
+              <svg class="outline-check" width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 7l3 3 6-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Convert to multitenant architecture using Data Pump
+            </li>
+            <li>
+              <svg class="outline-check" width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 7l3 3 6-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Ensure performance stability
+            </li>
+            <li>
+              <svg class="outline-check" width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 7l3 3 6-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Capture workload information
+            </li>
+            <li>
+              <svg class="outline-check" width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 7l3 3 6-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Find regressing statements using SQL Performance Analyzer
+            </li>
+            <li>
+              <svg class="outline-check" width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 7l3 3 6-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Fix regressions with SQL Plan Management
+            </li>
+            <li>
+              <svg class="outline-check" width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 7l3 3 6-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Restore after failed upgrade
+            </li>
+            <li>
+              <svg class="outline-check" width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 7l3 3 6-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Downgrade a pluggable database
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Prerequisites -->
+      <div class="sidebar-card">
+        <div class="sidebar-card-head"><h3>Prerequisites</h3></div>
+        <div class="sidebar-card-body">
+          <p style="font-size:12px;color:#888;margin-bottom:10px;font-style:italic;">PLEASE NOTE: This workshop is currently only available on the LiveLabs Sandbox!</p>
+          <ul class="prereq-list">
+            <li><span class="prereq-dot"></span>Familiarity with Oracle Database is required</li>
+            <li><span class="prereq-dot"></span>Some understanding of database terms is helpful</li>
+          </ul>
+        </div>
+      </div>
+
+    </div><!-- /sidebar -->
+
+  </div><!-- /content-layout -->
+</div><!-- /page-wrap -->
+
+<!-- ── FOOTER ── -->
+<footer>
+  <div class="fgrid">
+    <div class="fcol">
+      <h4>Resources</h4>
+      <a href="#">Developers</a><a href="#">Startups</a><a href="#">Students &amp; Educators</a>
+    </div>
+    <div class="fcol">
+      <h4>Partners</h4>
+      <a href="#">Oracle PartnerNetwork</a><a href="#">Find a Partner</a><a href="#">Log in to OPN</a>
+    </div>
+    <div class="fcol">
+      <h4>Solutions</h4>
+      <a href="#">Artificial Intelligence</a><a href="#">Internet of Things</a><a href="#">Blockchain</a>
+    </div>
+    <div class="fcol">
+      <h4>What's New</h4>
+      <a href="#">Oracle's response to COVID-19</a><a href="#">Java SE download</a><a href="#">Try Oracle Cloud Free Tier</a>
+    </div>
+    <div class="fcol">
+      <h4>Contact Us</h4>
+      <a href="#">US Sales: +1.800.633.0738</a><a href="#">How can we help?</a><a href="#">Subscribe to emails</a>
+    </div>
+  </div>
+  <div class="fbot">
+    <span>Release 2026.01.15 &nbsp;&middot;&nbsp; Built with &hearts; using <a href="#" class="apex">Oracle APEX</a></span>
+    <div>
+      <a href="#">&copy; 2026 Oracle</a>
+      <a href="#">Terms of Use &amp; Privacy</a>
+      <a href="#">Cookie Preferences</a>
+      <a href="#">Ad Choices</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  function toggleUserMenu() {
+    document.getElementById('userDropdown').classList.toggle('open');
+  }
+  document.addEventListener('click', function(e) {
+    const wrap = document.querySelector('.user-menu-wrap');
+    if (wrap && !wrap.contains(e.target)) document.getElementById('userDropdown').classList.remove('open');
+  });
+</script>
+</body>
+</html>
